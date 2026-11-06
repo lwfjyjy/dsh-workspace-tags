@@ -1,0 +1,3 @@
+- insert:
+    - id: workspace-tags
+      name: '@lwfjyjy/dsh-workspace-tags'

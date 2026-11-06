@@ -1,0 +1,48 @@
+{
+  "name": "@lwfjyjy/dsh-workspace-tags",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness 桌面版工作区标签：给侧边栏的工作区（文件夹）打彩色标签，参考 macOS 文件夹标签，方便辨认重要文件夹。纯前端 DOM 注入，不修改 DSH 源码。",
+  "type": "module",
+  "license": "MIT",
+  "author": "lwfjyjy",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "workspace",
+    "sidebar",
+    "tags",
+    "labels"
+  ],
+  "engines": {
+    "node": ">=24",
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}
