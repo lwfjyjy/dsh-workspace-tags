@@ -1,7 +1,7 @@
 {
   "name": "@lwfjyjy/dsh-workspace-tags",
-  "version": "1.0.0",
-  "description": "DeepSeek Harness 桌面版工作区标签：给侧边栏的工作区（文件夹）打彩色标签，参考 macOS 文件夹标签，方便辨认重要文件夹。纯前端 DOM 注入，不修改 DSH 源码。",
+  "version": "1.1.0",
+  "description": "DeepSeek Harness 桌面版侧栏增强：给工作区（文件夹）打彩色标签、给对话插入 Emoji 图标。纯前端 DOM 注入，不修改 DSH 源码。",
   "type": "module",
   "license": "MIT",
   "author": "lwfjyjy",
@@ -11,7 +11,9 @@
     "workspace",
     "sidebar",
     "tags",
-    "labels"
+    "labels",
+    "emoji",
+    "session-icon"
   ],
   "engines": {
     "node": ">=24",

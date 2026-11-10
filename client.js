@@ -56,6 +56,19 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     // ------------------------------------------------------------------
     const React = require('react');
     const TAG_ICON_KEY = 'workspace.tags';
+    const SESSION_ICON_KEY = 'session.icon';
+    // 菜单「插入图标」的 logo：手绘笑脸（圆形脸 + 两只眼 + 微笑）。
+    const SmileyIcon = () => React.createElement(
+      'svg',
+      {
+        xmlns: 'http://www.w3.org/2000/svg', width: '1em', height: '1em', viewBox: '0 0 24 24',
+        fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round',
+      },
+      React.createElement('circle', { cx: 12, cy: 12, r: 9 }),
+      React.createElement('circle', { cx: 9, cy: 10, r: 1.05, fill: 'currentColor', stroke: 'none' }),
+      React.createElement('circle', { cx: 15, cy: 10, r: 1.05, fill: 'currentColor', stroke: 'none' }),
+      React.createElement('path', { d: 'M8.2 14.2c1 1.3 2.3 2 3.8 2s2.8-.7 3.8-2' }),
+    );
     const TagIcon = () => React.createElement(
       'svg',
       {
@@ -65,6 +78,27 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
       React.createElement('path', { d: 'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z' }),
       React.createElement('circle', { cx: 7.5, cy: 7.5, r: 1.1, fill: 'currentColor', stroke: 'none' }),
     );
+    // Emoji 数据：构建期从系统「Apple Color Emoji」字体的 cmap 一次性导出（[表情, 英文名]），
+    // 运行时不读字体文件；下方 WINDOWS_UNSAFE_EMOJI_RANGES 再按平台兼容性过滤。请勿手改。
+    const EMOJI_GROUPS = [{"title":"常用","items":[["😀",""],["😄",""],["😁",""],["😊",""],["🙂",""],["😉",""],["😍",""],["🤔",""],["😎",""],["😭",""],["😡",""],["👍",""],["👏",""],["🙏",""],["💪",""],["👌",""],["✌️",""],["🤝",""],["❤️",""],["🔥",""],["⭐️",""],["🎉",""],["🎯",""],["✅️",""],["💡",""],["🚀",""],["📌",""],["📚",""],["💻",""],["🧩",""],["☕️",""],["🌱",""],["🎨",""],["🧪",""],["📦",""],["🔧",""],["🔒",""],["📝",""],["🧠",""],["🌍",""],["⚡️",""],["🏆",""]]},{"title":"表情与情绪","items":[["😀","Grinning Face"],["😁","Grinning Face With Smiling Eyes"],["😂","Face With Tears Of Joy"],["😃","Smiling Face With Open Mouth"],["😄","Smiling Face With Open Mouth And Smiling Eyes"],["😅","Smiling Face With Open Mouth And Cold Sweat"],["😆","Smiling Face With Open Mouth And Tightly-Closed Eyes"],["😇","Smiling Face With Halo"],["😈","Smiling Face With Horns"],["😉","Winking Face"],["😊","Smiling Face With Smiling Eyes"],["😋","Face Savouring Delicious Food"],["😌","Relieved Face"],["😍","Smiling Face With Heart-Shaped Eyes"],["😎","Smiling Face With Sunglasses"],["😏","Smirking Face"],["😐","Neutral Face"],["😑","Expressionless Face"],["😒","Unamused Face"],["😓","Face With Cold Sweat"],["😔","Pensive Face"],["😕","Confused Face"],["😖","Confounded Face"],["😗","Kissing Face"],["😘","Face Throwing A Kiss"],["😙","Kissing Face With Smiling Eyes"],["😚","Kissing Face With Closed Eyes"],["😛","Face With Stuck-Out Tongue"],["😜","Face With Stuck-Out Tongue And Winking Eye"],["😝","Face With Stuck-Out Tongue And Tightly-Closed Eyes"],["😞","Disappointed Face"],["😟","Worried Face"],["😠","Angry Face"],["😡","Pouting Face"],["😢","Crying Face"],["😣","Persevering Face"],["😤","Face With Look Of Triumph"],["😥","Disappointed But Relieved Face"],["😦","Frowning Face With Open Mouth"],["😧","Anguished Face"],["😨","Fearful Face"],["😩","Weary Face"],["😪","Sleepy Face"],["😫","Tired Face"],["😬","Grimacing Face"],["😭","Loudly Crying Face"],["😮","Face With Open Mouth"],["😯","Hushed Face"],["😰","Face With Open Mouth And Cold Sweat"],["😱","Face Screaming In Fear"],["😲","Astonished Face"],["😳","Flushed Face"],["😴","Sleeping Face"],["😵","Dizzy Face"],["😶","Face Without Mouth"],["😷","Face With Medical Mask"],["😸","Grinning Cat Face With Smiling Eyes"],["😹","Cat Face With Tears Of Joy"],["😺","Smiling Cat Face With Open Mouth"],["😻","Smiling Cat Face With Heart-Shaped Eyes"],["😼","Cat Face With Wry Smile"],["😽","Kissing Cat Face With Closed Eyes"],["😾","Pouting Cat Face"],["😿","Crying Cat Face"],["🙀","Weary Cat Face"],["🙁","Slightly Frowning Face"],["🙂","Slightly Smiling Face"],["🙃","Upside-Down Face"],["🙄","Face With Rolling Eyes"],["🙅","Face With No Good Gesture"],["🙆","Face With Ok Gesture"],["🙇","Person Bowing Deeply"],["🙈","See-No-Evil Monkey"],["🙉","Hear-No-Evil Monkey"],["🙊","Speak-No-Evil Monkey"],["🙋","Happy Person Raising One Hand"],["🙌","Person Raising Both Hands In Celebration"],["🙍","Person Frowning"],["🙎","Person With Pouting Face"],["🙏","Person With Folded Hands"],["🤐","Zipper-Mouth Face"],["🤑","Money-Mouth Face"],["🤒","Face With Thermometer"],["🤓","Nerd Face"],["🤔","Thinking Face"],["🤕","Face With Head-Bandage"],["🤖","Robot Face"],["🤗","Hugging Face"],["🤘","Sign Of The Horns"],["🤙","Call Me Hand"],["🤚","Raised Back Of Hand"],["🤛","Left-Facing Fist"],["🤜","Right-Facing Fist"],["🤝","Handshake"],["🤞","Hand With Index And Middle Fingers Crossed"],["🤟","I Love You Hand Sign"],["🤠","Face With Cowboy Hat"],["🤡","Clown Face"],["🤢","Nauseated Face"],["🤣","Rolling On The Floor Laughing"],["🤤","Drooling Face"],["🤥","Lying Face"],["🤦","Face Palm"],["🤧","Sneezing Face"],["🤨","Face With One Eyebrow Raised"],["🤩","Grinning Face With Star Eyes"],["🤪","Grinning Face With One Large And One Small Eye"],["🤫","Face With Finger Covering Closed Lips"],["🤬","Serious Face With Symbols Covering Mouth"],["🤭","Smiling Face With Smiling Eyes And Hand Covering Mouth"],["🤮","Face With Open Mouth Vomiting"],["🤯","Shocked Face With Exploding Head"],["🥰","Smiling Face With Smiling Eyes And Three Hearts"],["🥱","Yawning Face"],["🥲","Smiling Face With Tear"],["🥳","Face With Party Horn And Party Hat"],["🥴","Face With Uneven Eyes And Wavy Mouth"],["🥵","Overheated Face"],["🥶","Freezing Face"],["🥺","Face With Pleading Eyes"],["🧐","Face With Monocle"],["🫠",""],["🫡",""],["🫢",""],["🫣",""],["🫤",""],["🫥",""],["🫦",""],["🫧",""],["🫨",""],["🫩",""],["🫪",""],["🫯",""],["🫰",""],["🫱",""],["🫲",""],["🫳",""],["🫴",""],["🫵",""],["🫶",""],["🫷",""],["🫸",""]]},{"title":"手势与人物","items":[["✊️","Raised Fist"],["✋️","Raised Hand"],["✌️","Victory Hand"],["✍️","Writing Hand"],["👀","Eyes"],["👁","Eye"],["👂","Ear"],["👃","Nose"],["👄","Mouth"],["👅","Tongue"],["👆","White Up Pointing Backhand Index"],["👇","White Down Pointing Backhand Index"],["👈","White Left Pointing Backhand Index"],["👉","White Right Pointing Backhand Index"],["👊","Fisted Hand Sign"],["👋","Waving Hand Sign"],["👌","Ok Hand Sign"],["👍","Thumbs Up Sign"],["👎","Thumbs Down Sign"],["👏","Clapping Hands Sign"],["👐","Open Hands Sign"],["👤","Bust In Silhouette"],["👥","Busts In Silhouette"],["👦","Boy"],["👧","Girl"],["👨","Man"],["👩","Woman"],["👪","Family"],["👫","Man And Woman Holding Hands"],["👬","Two Men Holding Hands"],["👭","Two Women Holding Hands"],["👮","Police Officer"],["👯","Woman With Bunny Ears"],["👰","Bride With Veil"],["👱","Person With Blond Hair"],["👲","Man With Gua Pi Mao"],["👳","Man With Turban"],["👴","Older Man"],["👵","Older Woman"],["👶","Baby"],["👷","Construction Worker"],["👸","Princess"],["👹","Japanese Ogre"],["👺","Japanese Goblin"],["👻","Ghost"],["👼","Baby Angel"],["👽","Extraterrestrial Alien"],["👾","Alien Monster"],["👿","Imp"],["💀","Skull"],["💁","Information Desk Person"],["💂","Guardsman"],["💃","Dancer"],["💄","Lipstick"],["💅","Nail Polish"],["💆","Face Massage"],["💇","Haircut"],["🖕","Reversed Hand With Middle Finger Extended"],["🖖","Raised Hand With Part Between Middle And Ring Fingers"],["🤌","Pinched Fingers"],["🤰","Pregnant Woman"],["🤱","Breast-Feeding"],["🤲","Palms Up Together"],["🤳","Selfie"],["🤴","Prince"],["🤵","Man In Tuxedo"],["🤶","Mother Christmas"],["🤷","Shrug"],["🤸","Person Doing Cartwheel"],["🤹","Juggling"],["🤺","Fencer"],["🧑","Adult"],["🧒","Child"],["🧓","Older Adult"],["🧔","Bearded Person"],["🧕","Person With Headscarf"],["🧖","Person In Steamy Room"],["🧗","Person Climbing"],["🧘","Person In Lotus Position"],["🧙","Mage"],["🧚","Fairy"],["🧛","Vampire"],["🧜","Merperson"],["🧝","Elf"]]},{"title":"动物与自然","items":[["🌰","Chestnut"],["🌱","Seedling"],["🌲","Evergreen Tree"],["🌳","Deciduous Tree"],["🌴","Palm Tree"],["🌵","Cactus"],["🌶","Hot Pepper"],["🌷","Tulip"],["🌸","Cherry Blossom"],["🌹","Rose"],["🌺","Hibiscus"],["🌻","Sunflower"],["🌼","Blossom"],["🌽","Ear Of Maize"],["🌾","Ear Of Rice"],["🌿","Herb"],["🍀","Four Leaf Clover"],["🍁","Maple Leaf"],["🍂","Fallen Leaf"],["🍃","Leaf Fluttering In Wind"],["🐀","Rat"],["🐁","Mouse"],["🐂","Ox"],["🐃","Water Buffalo"],["🐄","Cow"],["🐅","Tiger"],["🐆","Leopard"],["🐇","Rabbit"],["🐈","Cat"],["🐉","Dragon"],["🐊","Crocodile"],["🐋","Whale"],["🐌","Snail"],["🐍","Snake"],["🐎","Horse"],["🐏","Ram"],["🐐","Goat"],["🐑","Sheep"],["🐒","Monkey"],["🐓","Rooster"],["🐔","Chicken"],["🐕","Dog"],["🐖","Pig"],["🐗","Boar"],["🐘","Elephant"],["🐙","Octopus"],["🐚","Spiral Shell"],["🐛","Bug"],["🐜","Ant"],["🐝","Honeybee"],["🐞","Lady Beetle"],["🐟","Fish"],["🐠","Tropical Fish"],["🐡","Blowfish"],["🐢","Turtle"],["🐣","Hatching Chick"],["🐤","Baby Chick"],["🐥","Front-Facing Baby Chick"],["🐦","Bird"],["🐧","Penguin"],["🐨","Koala"],["🐩","Poodle"],["🐪","Dromedary Camel"],["🐫","Bactrian Camel"],["🐬","Dolphin"],["🐭","Mouse Face"],["🐮","Cow Face"],["🐯","Tiger Face"],["🐰","Rabbit Face"],["🐱","Cat Face"],["🐲","Dragon Face"],["🐳","Spouting Whale"],["🐴","Horse Face"],["🐵","Monkey Face"],["🐶","Dog Face"],["🐷","Pig Face"],["🐸","Frog Face"],["🐹","Hamster Face"],["🐺","Wolf Face"],["🐻","Bear Face"],["🐼","Panda Face"],["🐽","Pig Nose"],["🐾","Paw Prints"],["🐿","Chipmunk"],["🦀","Crab"],["🦁","Lion Face"],["🦂","Scorpion"],["🦃","Turkey"],["🦄","Unicorn Face"],["🦅","Eagle"],["🦆","Duck"],["🦇","Bat"],["🦈","Shark"],["🦉","Owl"],["🦊","Fox Face"],["🦋","Butterfly"],["🦌","Deer"],["🦍","Gorilla"],["🦎","Lizard"],["🦏","Rhinoceros"],["🦐","Shrimp"],["🦑","Squid"],["🦒","Giraffe Face"],["🦓","Zebra Face"],["🦔","Hedgehog"],["🦕","Sauropod"],["🦖","T-Rex"],["🦗","Cricket"],["🦘","Kangaroo"],["🦙","Llama"],["🦚","Peacock"],["🦛","Hippopotamus"],["🦜","Parrot"],["🦝","Raccoon"],["🦞","Lobster"],["🦟","Mosquito"],["🦠","Microbe"],["🦡","Badger"],["🦢","Swan"],["🦣","Mammoth"],["🦤","Dodo"],["🦥","Sloth"],["🦦","Otter"],["🦧","Orangutan"],["🦨","Skunk"],["🦩","Flamingo"],["🦪","Oyster"],["🦫","Beaver"],["🦬","Bison"],["🦭","Seal"],["🦮","Guide Dog"]]},{"title":"食物与饮品","items":[["🌭","Hot Dog"],["🌮","Taco"],["🌯","Burrito"],["🍄","Mushroom"],["🍅","Tomato"],["🍆","Aubergine"],["🍇","Grapes"],["🍈","Melon"],["🍉","Watermelon"],["🍊","Tangerine"],["🍋","Lemon"],["🍌","Banana"],["🍍","Pineapple"],["🍎","Red Apple"],["🍏","Green Apple"],["🍐","Pear"],["🍑","Peach"],["🍒","Cherries"],["🍓","Strawberry"],["🍔","Hamburger"],["🍕","Slice Of Pizza"],["🍖","Meat On Bone"],["🍗","Poultry Leg"],["🍘","Rice Cracker"],["🍙","Rice Ball"],["🍚","Cooked Rice"],["🍛","Curry And Rice"],["🍜","Steaming Bowl"],["🍝","Spaghetti"],["🍞","Bread"],["🍟","French Fries"],["🍠","Roasted Sweet Potato"],["🍡","Dango"],["🍢","Oden"],["🍣","Sushi"],["🍤","Fried Shrimp"],["🍥","Fish Cake With Swirl Design"],["🍦","Soft Ice Cream"],["🍧","Shaved Ice"],["🍨","Ice Cream"],["🍩","Doughnut"],["🍪","Cookie"],["🍫","Chocolate Bar"],["🍬","Candy"],["🍭","Lollipop"],["🍮","Custard"],["🍯","Honey Pot"],["🍰","Shortcake"],["🍱","Bento Box"],["🍲","Pot Of Food"],["🍳","Cooking"],["🍴","Fork And Knife"],["🍵","Teacup Without Handle"],["🍶","Sake Bottle And Cup"],["🍷","Wine Glass"],["🍸","Cocktail Glass"],["🍹","Tropical Drink"],["🍺","Beer Mug"],["🍻","Clinking Beer Mugs"],["🍼","Baby Bottle"],["🍽","Fork And Knife With Plate"],["🍾","Bottle With Popping Cork"],["🍿","Popcorn"],["🥐","Croissant"],["🥑","Avocado"],["🥒","Cucumber"],["🥓","Bacon"],["🥔","Potato"],["🥕","Carrot"],["🥖","Baguette Bread"],["🥗","Green Salad"],["🥘","Shallow Pan Of Food"],["🥙","Stuffed Flatbread"],["🥚","Egg"],["🥛","Glass Of Milk"],["🥜","Peanuts"],["🥝","Kiwifruit"],["🥞","Pancakes"],["🥟","Dumpling"],["🥠","Fortune Cookie"],["🥡","Takeout Box"],["🥢","Chopsticks"],["🥣","Bowl With Spoon"],["🥤","Cup With Straw"],["🥥","Coconut"],["🥦","Broccoli"],["🥧","Pie"],["🥨","Pretzel"],["🥩","Cut Of Meat"],["🥪","Sandwich"],["🥫","Canned Food"],["🥬","Leafy Green"],["🥭","Mango"],["🥮","Moon Cake"],["🥯","Bagel"],["🧀","Cheese Wedge"],["🧁","Cupcake"],["🧂","Salt Shaker"]]},{"title":"活动与运动","items":[["🎀","Ribbon"],["🎁","Wrapped Present"],["🎂","Birthday Cake"],["🎃","Jack-O-Lantern"],["🎄","Christmas Tree"],["🎅","Father Christmas"],["🎆","Fireworks"],["🎇","Firework Sparkler"],["🎈","Balloon"],["🎉","Party Popper"],["🎊","Confetti Ball"],["🎋","Tanabata Tree"],["🎌","Crossed Flags"],["🎍","Pine Decoration"],["🎎","Japanese Dolls"],["🎏","Carp Streamer"],["🎐","Wind Chime"],["🎑","Moon Viewing Ceremony"],["🎒","School Satchel"],["🎓","Graduation Cap"],["🎖","Military Medal"],["🎗","Reminder Ribbon"],["🎙","Studio Microphone"],["🎚","Level Slider"],["🎛","Control Knobs"],["🎞","Film Frames"],["🎟","Admission Tickets"],["🎠","Carousel Horse"],["🎡","Ferris Wheel"],["🎢","Roller Coaster"],["🎣","Fishing Pole And Fish"],["🎤","Microphone"],["🎥","Movie Camera"],["🎦","Cinema"],["🎧","Headphone"],["🎨","Artist Palette"],["🎩","Top Hat"],["🎪","Circus Tent"],["🎫","Ticket"],["🎬","Clapper Board"],["🎭","Performing Arts"],["🎮","Video Game"],["🎯","Direct Hit"],["🎰","Slot Machine"],["🎱","Billiards"],["🎲","Game Die"],["🎳","Bowling"],["🎴","Flower Playing Cards"],["🎵","Musical Note"],["🎶","Multiple Musical Notes"],["🎷","Saxophone"],["🎸","Guitar"],["🎹","Musical Keyboard"],["🎺","Trumpet"],["🎻","Violin"],["🎼","Musical Score"],["🎽","Running Shirt With Sash"],["🎾","Tennis Racquet And Ball"],["🎿","Ski And Ski Boot"],["🏀","Basketball And Hoop"],["🏁","Chequered Flag"],["🏂","Snowboarder"],["🏃","Runner"],["🏄","Surfer"],["🏅","Sports Medal"],["🏆","Trophy"],["🏇","Horse Racing"],["🏈","American Football"],["🏉","Rugby Football"],["🏊","Swimmer"],["🏋","Weight Lifter"],["🏌","Golfer"],["🏍","Racing Motorcycle"],["🏎","Racing Car"],["🏏","Cricket Bat And Ball"],["🏐","Volleyball"],["🏑","Field Hockey Stick And Ball"],["🏒","Ice Hockey Stick And Puck"],["🏓","Table Tennis Paddle And Ball"],["🏔","Snow Capped Mountain"],["🏕","Camping"],["🏖","Beach With Umbrella"],["🏗","Building Construction"],["🏘","House Buildings"],["🏙","Cityscape"],["🏚","Derelict House Building"],["🏛","Classical Building"],["🏜","Desert"],["🏝","Desert Island"],["🏞","National Park"],["🏟","Stadium"],["🏠","House Building"],["🏡","House With Garden"],["🏢","Office Building"],["🏣","Japanese Post Office"],["🏤","European Post Office"],["🏥","Hospital"],["🏦","Bank"],["🏧","Automated Teller Machine"],["🏨","Hotel"],["🏩","Love Hotel"],["🏪","Convenience Store"],["🏫","School"],["🏬","Department Store"],["🏭","Factory"],["🏮","Izakaya Lantern"],["🏯","Japanese Castle"],["🏰","European Castle"],["🏳","Waving White Flag"],["🏴","Waving Black Flag"],["🏵","Rosette"],["🏷","Label"],["🏸","Badminton Racquet And Shuttlecock"],["🏹","Bow And Arrow"],["🏺","Amphora"],["🥅","Goal Net"],["🥇","First Place Medal"],["🥈","Second Place Medal"],["🥉","Third Place Medal"],["🥊","Boxing Glove"],["🥋","Martial Arts Uniform"],["🥌","Curling Stone"]]},{"title":"旅行与地点","items":[["⛩️","Shinto Shrine"],["⛰️","Mountain"],["⛱️","Umbrella On Ground"],["⛲️","Fountain"],["⛳️","Flag In Hole"],["⛴️","Ferry"],["⛵️","Sailboat"],["⛺️","Tent"],["⛽️","Fuel Pump"],["🗺","World Map"],["🗻","Mount Fuji"],["🗼","Tokyo Tower"],["🗽","Statue Of Liberty"],["🗾","Silhouette Of Japan"],["🗿","Moyai"],["🚀","Rocket"],["🚁","Helicopter"],["🚂","Steam Locomotive"],["🚃","Railway Car"],["🚄","High-Speed Train"],["🚅","High-Speed Train With Bullet Nose"],["🚆","Train"],["🚇","Metro"],["🚈","Light Rail"],["🚉","Station"],["🚊","Tram"],["🚋","Tram Car"],["🚌","Bus"],["🚍","Oncoming Bus"],["🚎","Trolleybus"],["🚏","Bus Stop"],["🚐","Minibus"],["🚑","Ambulance"],["🚒","Fire Engine"],["🚓","Police Car"],["🚔","Oncoming Police Car"],["🚕","Taxi"],["🚖","Oncoming Taxi"],["🚗","Automobile"],["🚘","Oncoming Automobile"],["🚙","Recreational Vehicle"],["🚚","Delivery Truck"],["🚛","Articulated Lorry"],["🚜","Tractor"],["🚝","Monorail"],["🚞","Mountain Railway"],["🚟","Suspension Railway"],["🚠","Mountain Cableway"],["🚡","Aerial Tramway"],["🚢","Ship"],["🚣","Rowboat"],["🚤","Speedboat"],["🚥","Horizontal Traffic Light"],["🚦","Vertical Traffic Light"],["🚧","Construction Sign"],["🚨","Police Cars Revolving Light"],["🚩","Triangular Flag On Post"],["🚪","Door"],["🚫","No Entry Sign"],["🚬","Smoking Symbol"],["🚭","No Smoking Symbol"],["🚮","Put Litter In Its Place Symbol"],["🚯","Do Not Litter Symbol"],["🚰","Potable Water Symbol"],["🚱","Non-Potable Water Symbol"],["🚲","Bicycle"],["🚳","No Bicycles"],["🚴","Bicyclist"],["🚵","Mountain Bicyclist"],["🚶","Pedestrian"],["🚷","No Pedestrians"],["🚸","Children Crossing"],["🚹","Mens Symbol"],["🚺","Womens Symbol"],["🚻","Restroom"],["🚼","Baby Symbol"],["🚽","Toilet"],["🚾","Water Closet"],["🚿","Shower"],["🛀","Bath"],["🛁","Bathtub"],["🛂","Passport Control"],["🛃","Customs"],["🛄","Baggage Claim"],["🛅","Left Luggage"],["🛋","Couch And Lamp"],["🛌","Sleeping Accommodation"],["🛍","Shopping Bags"],["🛎","Bellhop Bell"],["🛏","Bed"],["🛐","Place Of Worship"],["🛑","Octagonal Sign"],["🛒","Shopping Trolley"],["🛕","Hindu Temple"],["🛖","Hut"],["🛗","Elevator"],["🛘",""],["🛜",""],["🛝",""],["🛞",""],["🛟",""],["🛠","Hammer And Wrench"],["🛡","Shield"],["🛢","Oil Drum"],["🛣","Motorway"],["🛤","Railway Track"],["🛥","Motor Boat"],["🛩","Small Airplane"],["🛫","Airplane Departure"],["🛬","Airplane Arriving"],["🛰","Satellite"],["🛳","Passenger Ship"],["🛴","Scooter"],["🛵","Motor Scooter"],["🛶","Canoe"],["🛷","Sled"],["🛸","Flying Saucer"],["🛹","Skateboard"],["🛺","Auto Rickshaw"],["🛻","Pickup Truck"],["🛼","Roller Skate"]]},{"title":"物品与工具","items":[["💠","Diamond Shape With A Dot Inside"],["💡","Electric Light Bulb"],["💢","Anger Symbol"],["💣","Bomb"],["💤","Sleeping Symbol"],["💥","Collision Symbol"],["💦","Splashing Sweat Symbol"],["💧","Droplet"],["💨","Dash Symbol"],["💩","Pile Of Poo"],["💪","Flexed Biceps"],["💫","Dizzy Symbol"],["💬","Speech Balloon"],["💭","Thought Balloon"],["💮","White Flower"],["💯","Hundred Points Symbol"],["💰","Money Bag"],["💱","Currency Exchange"],["💲","Heavy Dollar Sign"],["💳","Credit Card"],["💴","Banknote With Yen Sign"],["💵","Banknote With Dollar Sign"],["💶","Banknote With Euro Sign"],["💷","Banknote With Pound Sign"],["💸","Money With Wings"],["💹","Chart With Upwards Trend And Yen Sign"],["💺","Seat"],["💻","Personal Computer"],["💼","Briefcase"],["💽","Minidisc"],["💾","Floppy Disk"],["💿","Optical Disc"],["📀","Dvd"],["📁","File Folder"],["📂","Open File Folder"],["📃","Page With Curl"],["📄","Page Facing Up"],["📅","Calendar"],["📆","Tear-Off Calendar"],["📇","Card Index"],["📈","Chart With Upwards Trend"],["📉","Chart With Downwards Trend"],["📊","Bar Chart"],["📋","Clipboard"],["📌","Pushpin"],["📍","Round Pushpin"],["📎","Paperclip"],["📏","Straight Ruler"],["📐","Triangular Ruler"],["📑","Bookmark Tabs"],["📒","Ledger"],["📓","Notebook"],["📔","Notebook With Decorative Cover"],["📕","Closed Book"],["📖","Open Book"],["📗","Green Book"],["📘","Blue Book"],["📙","Orange Book"],["📚","Books"],["📛","Name Badge"],["📜","Scroll"],["📝","Memo"],["📞","Telephone Receiver"],["📟","Pager"],["📠","Fax Machine"],["📡","Satellite Antenna"],["📢","Public Address Loudspeaker"],["📣","Cheering Megaphone"],["📤","Outbox Tray"],["📥","Inbox Tray"],["📦","Package"],["📧","E-Mail Symbol"],["📨","Incoming Envelope"],["📩","Envelope With Downwards Arrow Above"],["📪","Closed Mailbox With Lowered Flag"],["📫","Closed Mailbox With Raised Flag"],["📬","Open Mailbox With Raised Flag"],["📭","Open Mailbox With Lowered Flag"],["📮","Postbox"],["📯","Postal Horn"],["📰","Newspaper"],["📱","Mobile Phone"],["📲","Mobile Phone With Rightwards Arrow At Left"],["📳","Vibration Mode"],["📴","Mobile Phone Off"],["📵","No Mobile Phones"],["📶","Antenna With Bars"],["📷","Camera"],["📸","Camera With Flash"],["📹","Video Camera"],["📺","Television"],["📻","Radio"],["📼","Videocassette"],["📽","Film Projector"],["📿","Prayer Beads"],["🔇","Speaker With Cancellation Stroke"],["🔈","Speaker"],["🔉","Speaker With One Sound Wave"],["🔊","Speaker With Three Sound Waves"],["🔋","Battery"],["🔌","Electric Plug"],["🔍","Left-Pointing Magnifying Glass"],["🔎","Right-Pointing Magnifying Glass"],["🔏","Lock With Ink Pen"],["🔐","Closed Lock With Key"],["🔑","Key"],["🔒","Lock"],["🔓","Open Lock"],["🔔","Bell"],["🔕","Bell With Cancellation Stroke"],["🔖","Bookmark"],["🔗","Link Symbol"],["🔘","Radio Button"],["🔙","Back With Leftwards Arrow Above"],["🔚","End With Leftwards Arrow Above"],["🔛","On With Exclamation Mark With Left Right Arrow Above"],["🔜","Soon With Rightwards Arrow Above"],["🔝","Top With Upwards Arrow Above"],["🔞","No One Under Eighteen Symbol"],["🔟","Keycap Ten"],["🔦","Electric Torch"],["🔧","Wrench"],["🔨","Hammer"],["🔩","Nut And Bolt"],["🔪","Hocho"],["🔫","Pistol"],["🔬","Microscope"],["🔭","Telescope"],["🔮","Crystal Ball"],["🔯","Six Pointed Star With Middle Dot"],["🔰","Japanese Symbol For Beginner"],["🔱","Trident Emblem"],["🔲","Black Square Button"],["🔳","White Square Button"],["🔴","Large Red Circle"],["🔵","Large Blue Circle"],["🔶","Large Orange Diamond"],["🔷","Large Blue Diamond"],["🔸","Small Orange Diamond"],["🔹","Small Blue Diamond"],["🔺","Up-Pointing Red Triangle"],["🔻","Down-Pointing Red Triangle"],["🔼","Up-Pointing Small Red Triangle"],["🔽","Down-Pointing Small Red Triangle"],["🕉","Om Symbol"],["🕊","Dove Of Peace"],["🕋","Kaaba"],["🕌","Mosque"],["🕍","Synagogue"],["🕎","Menorah With Nine Branches"],["🕐","Clock Face One Oclock"],["🕑","Clock Face Two Oclock"],["🕒","Clock Face Three Oclock"],["🕓","Clock Face Four Oclock"],["🕔","Clock Face Five Oclock"],["🕕","Clock Face Six Oclock"],["🕖","Clock Face Seven Oclock"],["🕗","Clock Face Eight Oclock"],["🕘","Clock Face Nine Oclock"],["🕙","Clock Face Ten Oclock"],["🕚","Clock Face Eleven Oclock"],["🕛","Clock Face Twelve Oclock"],["🕜","Clock Face One-Thirty"],["🕝","Clock Face Two-Thirty"],["🕞","Clock Face Three-Thirty"],["🕟","Clock Face Four-Thirty"],["🕠","Clock Face Five-Thirty"],["🕡","Clock Face Six-Thirty"],["🕢","Clock Face Seven-Thirty"],["🕣","Clock Face Eight-Thirty"],["🕤","Clock Face Nine-Thirty"],["🕥","Clock Face Ten-Thirty"],["🕦","Clock Face Eleven-Thirty"],["🕧","Clock Face Twelve-Thirty"],["🕯","Candle"],["🕰","Mantelpiece Clock"],["🕳","Hole"],["🕴","Man In Business Suit Levitating"],["🕵","Sleuth Or Spy"],["🕶","Dark Sunglasses"],["🕷","Spider"],["🕸","Spider Web"],["🕹","Joystick"],["🕺","Man Dancing"],["🖇","Linked Paperclips"],["🖊","Lower Left Ballpoint Pen"],["🖋","Lower Left Fountain Pen"],["🖌","Lower Left Paintbrush"],["🖍","Lower Left Crayon"],["🖐","Raised Hand With Fingers Splayed"],["🖤","Black Heart"],["🖥","Desktop Computer"],["🖨","Printer"],["🖱","Three Button Mouse"],["🖲","Trackball"],["🖼","Frame With Picture"],["🗂","Card Index Dividers"],["🗃","Card File Box"],["🗄","File Cabinet"],["🗑","Wastebasket"],["🗒","Spiral Note Pad"],["🗓","Spiral Calendar Pad"],["🗜","Compression"],["🗝","Old Key"],["🗞","Rolled-Up Newspaper"],["🗡","Dagger Knife"],["🗣","Speaking Head In Silhouette"],["🗨","Left Speech Bubble"],["🗯","Right Anger Bubble"],["🗳","Ballot Box With Ballot"],["🦯","Probing Cane"],["🦰","Emoji Component Red Hair"],["🦱","Emoji Component Curly Hair"],["🦲","Emoji Component Bald"],["🦳","Emoji Component White Hair"],["🦴","Bone"],["🦵","Leg"],["🦶","Foot"],["🦷","Tooth"],["🦸","Superhero"],["🦹","Supervillain"],["🦺","Safety Vest"],["🦻","Ear With Hearing Aid"],["🦼","Motorized Wheelchair"],["🦽","Manual Wheelchair"],["🦾","Mechanical Arm"],["🦿","Mechanical Leg"],["🧃","Beverage Box"],["🧄","Garlic"],["🧅","Onion"],["🧆","Falafel"],["🧇","Waffle"],["🧈","Butter"],["🧉","Mate Drink"],["🧊","Ice Cube"],["🧋","Bubble Tea"],["🧌",""],["🧍","Standing Person"],["🧎","Kneeling Person"],["🧏","Deaf Person"],["🧞","Genie"],["🧟","Zombie"],["🧠","Brain"],["🧡","Orange Heart"],["🧢","Billed Cap"],["🧣","Scarf"],["🧤","Gloves"],["🧥","Coat"],["🧦","Socks"],["🧧","Red Gift Envelope"],["🧨","Firecracker"],["🧩","Jigsaw Puzzle Piece"],["🧪","Test Tube"],["🧫","Petri Dish"],["🧬","Dna Double Helix"],["🧭","Compass"],["🧮","Abacus"],["🧯","Fire Extinguisher"],["🧰","Toolbox"],["🧱","Brick"],["🧲","Magnet"],["🧳","Luggage"],["🧴","Lotion Bottle"],["🧵","Spool Of Thread"],["🧶","Ball Of Yarn"],["🧷","Safety Pin"],["🧸","Teddy Bear"],["🧹","Broom"],["🧺","Basket"],["🧻","Roll Of Paper"],["🧼","Bar Of Soap"],["🧽","Sponge"],["🧾","Receipt"],["🧿","Nazar Amulet"]]},{"title":"符号与标记","items":[["©️","Copyright Sign"],["®️","Registered Sign"],["‼️","Double Exclamation Mark"],["⁉️","Exclamation Question Mark"],["™️","Trade Mark Sign"],["ℹ️","Information Source"],["↔️","Left Right Arrow"],["↕️","Up Down Arrow"],["↖️","North West Arrow"],["↗️","North East Arrow"],["↘️","South East Arrow"],["↙️","South West Arrow"],["↩️","Leftwards Arrow With Hook"],["↪️","Rightwards Arrow With Hook"],["⌚️","Watch"],["⌛️","Hourglass"],["⌨️","Keyboard"],["⏏️","Eject Symbol"],["⏩️","Black Right-Pointing Double Triangle"],["⏪️","Black Left-Pointing Double Triangle"],["⏫️","Black Up-Pointing Double Triangle"],["⏬️","Black Down-Pointing Double Triangle"],["⏭️","Black Right-Pointing Double Triangle With Vertical Bar"],["⏮️","Black Left-Pointing Double Triangle With Vertical Bar"],["⏯️","Black Right-Pointing Triangle With Double Vertical Bar"],["⏰️","Alarm Clock"],["⏱️","Stopwatch"],["⏲️","Timer Clock"],["⏳️","Hourglass With Flowing Sand"],["⏸️","Double Vertical Bar"],["⏹️","Black Square For Stop"],["⏺️","Black Circle For Record"],["▪️","Black Small Square"],["▫️","White Small Square"],["▶️","Black Right-Pointing Triangle"],["◀️","Black Left-Pointing Triangle"],["◻️","White Medium Square"],["◼️","Black Medium Square"],["◽️","White Medium Small Square"],["◾️","Black Medium Small Square"],["☀️","Black Sun With Rays"],["☁️","Cloud"],["☂️","Umbrella"],["☃️","Snowman"],["☄️","Comet"],["☎️","Black Telephone"],["☑️","Ballot Box With Check"],["☔️","Umbrella With Rain Drops"],["☕️","Hot Beverage"],["☘️","Shamrock"],["☝️","White Up Pointing Index"],["☠️","Skull And Crossbones"],["☢️","Radioactive Sign"],["☣️","Biohazard Sign"],["☦️","Orthodox Cross"],["☪️","Star And Crescent"],["☮️","Peace Symbol"],["☯️","Yin Yang"],["☸️","Wheel Of Dharma"],["☹️","White Frowning Face"],["☺️","White Smiling Face"],["♀️","Female Sign"],["♂️","Male Sign"],["♈️","Aries"],["♉️","Taurus"],["♊️","Gemini"],["♋️","Cancer"],["♌️","Leo"],["♍️","Virgo"],["♎️","Libra"],["♏️","Scorpius"],["♐️","Sagittarius"],["♑️","Capricorn"],["♒️","Aquarius"],["♓️","Pisces"],["♟️","Black Chess Pawn"],["♠️","Black Spade Suit"],["♣️","Black Club Suit"],["♥️","Black Heart Suit"],["♦️","Black Diamond Suit"],["♨️","Hot Springs"],["♻️","Black Universal Recycling Symbol"],["♾️","Permanent Paper Sign"],["♿️","Wheelchair Symbol"],["⚒️","Hammer And Pick"],["⚓️","Anchor"],["⚔️","Crossed Swords"],["⚕️","Staff Of Aesculapius"],["⚖️","Scales"],["⚗️","Alembic"],["⚙️","Gear"],["⚛️","Atom Symbol"],["⚜️","Fleur-De-Lis"],["⚠️","Warning Sign"],["⚡️","High Voltage Sign"],["⚧️","Male With Stroke And Male And Female Sign"],["⚪️","Medium White Circle"],["⚫️","Medium Black Circle"],["⚰️","Coffin"],["⚱️","Funeral Urn"],["⚽️","Soccer Ball"],["⚾️","Baseball"],["⛄️","Snowman Without Snow"],["⛅️","Sun Behind Cloud"],["⛈️","Thunder Cloud And Rain"],["⛎️","Ophiuchus"],["⛏️","Pick"],["⛑️","Helmet With White Cross"],["⛓️","Chains"],["⛔️","No Entry"],["⛪️","Church"],["⛷️","Skier"],["⛸️","Ice Skate"],["⛹️","Person With Ball"],["✂️","Black Scissors"],["✅️","White Heavy Check Mark"],["✈️","Airplane"],["✉️","Envelope"],["✏️","Pencil"],["✒️","Black Nib"],["✔️","Heavy Check Mark"],["✖️","Heavy Multiplication X"],["✝️","Latin Cross"],["✡️","Star Of David"],["✨️","Sparkles"],["✳️","Eight Spoked Asterisk"],["✴️","Eight Pointed Black Star"],["❄️","Snowflake"],["❇️","Sparkle"],["❌️","Cross Mark"],["❎️","Negative Squared Cross Mark"],["❓️","Black Question Mark Ornament"],["❔️","White Question Mark Ornament"],["❕️","White Exclamation Mark Ornament"],["❗️","Heavy Exclamation Mark Symbol"],["❣️","Heavy Heart Exclamation Mark Ornament"],["❤️","Heavy Black Heart"],["➕️","Heavy Plus Sign"],["➖️","Heavy Minus Sign"],["➗️","Heavy Division Sign"],["➡️","Black Rightwards Arrow"],["➰️","Curly Loop"],["➿️","Double Curly Loop"],["⤴️","Arrow Pointing Rightwards Then Curving Upwards"],["⤵️","Arrow Pointing Rightwards Then Curving Downwards"],["⬅️","Leftwards Black Arrow"],["⬆️","Upwards Black Arrow"],["⬇️","Downwards Black Arrow"],["⬛️","Black Large Square"],["⬜️","White Large Square"],["⭐️","White Medium Star"],["⭕️","Heavy Large Circle"],["〰️","Wavy Dash"],["〽️","Part Alternation Mark"],["㊗️","Circled Ideograph Congratulation"],["㊙️","Circled Ideograph Secret"]]},{"title":"其他","items":[["🀄","Mahjong Tile Red Dragon"],["🃏","Playing Card Black Joker"],["🅰","Negative Squared Latin Capital Letter A"],["🅱","Negative Squared Latin Capital Letter B"],["🅾","Negative Squared Latin Capital Letter O"],["🅿","Negative Squared Latin Capital Letter P"],["🆎","Negative Squared Ab"],["🆑","Squared Cl"],["🆒","Squared Cool"],["🆓","Squared Free"],["🆔","Squared Id"],["🆕","Squared New"],["🆖","Squared Ng"],["🆗","Squared Ok"],["🆘","Squared Sos"],["🆙","Squared Up With Exclamation Mark"],["🆚","Squared Vs"],["🈁","Squared Katakana Koko"],["🈂","Squared Katakana Sa"],["🈚","Squared Cjk Unified Ideograph-7121"],["🈯","Squared Cjk Unified Ideograph-6307"],["🈲","Squared Cjk Unified Ideograph-7981"],["🈳","Squared Cjk Unified Ideograph-7A7A"],["🈴","Squared Cjk Unified Ideograph-5408"],["🈵","Squared Cjk Unified Ideograph-6E80"],["🈶","Squared Cjk Unified Ideograph-6709"],["🈷","Squared Cjk Unified Ideograph-6708"],["🈸","Squared Cjk Unified Ideograph-7533"],["🈹","Squared Cjk Unified Ideograph-5272"],["🈺","Squared Cjk Unified Ideograph-55B6"],["🉐","Circled Ideograph Advantage"],["🉑","Circled Ideograph Accept"],["🌀","Cyclone"],["🌁","Foggy"],["🌂","Closed Umbrella"],["🌃","Night With Stars"],["🌄","Sunrise Over Mountains"],["🌅","Sunrise"],["🌆","Cityscape At Dusk"],["🌇","Sunset Over Buildings"],["🌈","Rainbow"],["🌉","Bridge At Night"],["🌊","Water Wave"],["🌋","Volcano"],["🌌","Milky Way"],["🌍","Earth Globe Europe-Africa"],["🌎","Earth Globe Americas"],["🌏","Earth Globe Asia-Australia"],["🌐","Globe With Meridians"],["🌑","New Moon Symbol"],["🌒","Waxing Crescent Moon Symbol"],["🌓","First Quarter Moon Symbol"],["🌔","Waxing Gibbous Moon Symbol"],["🌕","Full Moon Symbol"],["🌖","Waning Gibbous Moon Symbol"],["🌗","Last Quarter Moon Symbol"],["🌘","Waning Crescent Moon Symbol"],["🌙","Crescent Moon"],["🌚","New Moon With Face"],["🌛","First Quarter Moon With Face"],["🌜","Last Quarter Moon With Face"],["🌝","Full Moon With Face"],["🌞","Sun With Face"],["🌟","Glowing Star"],["🌠","Shooting Star"],["🌡","Thermometer"],["🌤","White Sun With Small Cloud"],["🌥","White Sun Behind Cloud"],["🌦","White Sun Behind Cloud With Rain"],["🌧","Cloud With Rain"],["🌨","Cloud With Snow"],["🌩","Cloud With Lightning"],["🌪","Cloud With Tornado"],["🌫","Fog"],["🌬","Wind Blowing Face"],["👑","Crown"],["👒","Womans Hat"],["👓","Eyeglasses"],["👔","Necktie"],["👕","T-Shirt"],["👖","Jeans"],["👗","Dress"],["👘","Kimono"],["👙","Bikini"],["👚","Womans Clothes"],["👛","Purse"],["👜","Handbag"],["👝","Pouch"],["👞","Mans Shoe"],["👟","Athletic Shoe"],["👠","High-Heeled Shoe"],["👡","Womans Sandal"],["👢","Womans Boots"],["👣","Footprints"],["💈","Barber Pole"],["💉","Syringe"],["💊","Pill"],["💋","Kiss Mark"],["💌","Love Letter"],["💍","Ring"],["💎","Gem Stone"],["💏","Kiss"],["💐","Bouquet"],["💑","Couple With Heart"],["💒","Wedding"],["💓","Beating Heart"],["💔","Broken Heart"],["💕","Two Hearts"],["💖","Sparkling Heart"],["💗","Growing Heart"],["💘","Heart With Arrow"],["💙","Blue Heart"],["💚","Green Heart"],["💛","Yellow Heart"],["💜","Purple Heart"],["💝","Heart With Ribbon"],["💞","Revolving Hearts"],["💟","Heart Decoration"],["🔀","Twisted Rightwards Arrows"],["🔁","Clockwise Rightwards And Leftwards Open Circle Arrows"],["🔂","Clockwise Rightwards And Leftwards Open Circle Arrows With Circled One Overlay"],["🔃","Clockwise Downwards And Upwards Open Circle Arrows"],["🔄","Anticlockwise Downwards And Upwards Open Circle Arrows"],["🔅","Low Brightness Symbol"],["🔆","High Brightness Symbol"],["🔠","Input Symbol For Latin Capital Letters"],["🔡","Input Symbol For Latin Small Letters"],["🔢","Input Symbol For Numbers"],["🔣","Input Symbol For Symbols"],["🔤","Input Symbol For Latin Letters"],["🔥","Fire"],["🟠","Large Orange Circle"],["🟡","Large Yellow Circle"],["🟢","Large Green Circle"],["🟣","Large Purple Circle"],["🟤","Large Brown Circle"],["🟥","Large Red Square"],["🟦","Large Blue Square"],["🟧","Large Orange Square"],["🟨","Large Yellow Square"],["🟩","Large Green Square"],["🟪","Large Purple Square"],["🟫","Large Brown Square"],["🟰",""],["🤍","White Heart"],["🤎","Brown Heart"],["🤏","Pinching Hand"],["🤼","Wrestlers"],["🤽","Water Polo"],["🤾","Handball"],["🤿","Diving Mask"],["🥀","Wilted Flower"],["🥁","Drum With Drumsticks"],["🥂","Clinking Glasses"],["🥃","Tumbler Glass"],["🥄","Spoon"],["🥍","Lacrosse Stick And Ball"],["🥎","Softball"],["🥏","Flying Disc"],["🥷","Ninja"],["🥸","Disguised Face"],["🥹",""],["🥻","Sari"],["🥼","Lab Coat"],["🥽","Goggles"],["🥾","Hiking Boot"],["🥿","Flat Shoe"],["🩰","Ballet Shoes"],["🩱","One-Piece Swimsuit"],["🩲","Briefs"],["🩳","Shorts"],["🩴","Thong Sandal"],["🩵",""],["🩶",""],["🩷",""],["🩸","Drop Of Blood"],["🩹","Adhesive Bandage"],["🩺","Stethoscope"],["🩻",""],["🩼",""],["🪀","Yo-Yo"],["🪁","Kite"],["🪂","Parachute"],["🪃","Boomerang"],["🪄","Magic Wand"],["🪅","Pinata"],["🪆","Nesting Dolls"],["🪇",""],["🪈",""],["🪉",""],["🪊",""],["🪎",""],["🪏",""],["🪐","Ringed Planet"],["🪑","Chair"],["🪒","Razor"],["🪓","Axe"],["🪔","Diya Lamp"],["🪕","Banjo"],["🪖","Military Helmet"],["🪗","Accordion"],["🪘","Long Drum"],["🪙","Coin"],["🪚","Carpentry Saw"],["🪛","Screwdriver"],["🪜","Ladder"],["🪝","Hook"],["🪞","Mirror"],["🪟","Window"],["🪠","Plunger"],["🪡","Sewing Needle"],["🪢","Knot"],["🪣","Bucket"],["🪤","Mouse Trap"],["🪥","Toothbrush"],["🪦","Headstone"],["🪧","Placard"],["🪨","Rock"],["🪩",""],["🪪",""],["🪫",""],["🪬",""],["🪭",""],["🪮",""],["🪯",""],["🪰","Fly"],["🪱","Worm"],["🪲","Beetle"],["🪳","Cockroach"],["🪴","Potted Plant"],["🪵","Wood"],["🪶","Feather"],["🪷",""],["🪸",""],["🪹",""],["🪺",""],["🪻",""],["🪼",""],["🪽",""],["🪾",""],["🪿",""],["🫀","Anatomical Heart"],["🫁","Lungs"],["🫂","People Hugging"],["🫃",""],["🫄",""],["🫅",""],["🫆",""],["🫈",""],["🫍",""],["🫎",""],["🫏",""],["🫐","Blueberries"],["🫑","Bell Pepper"],["🫒","Olive"],["🫓","Flatbread"],["🫔","Tamale"],["🫕","Fondue"],["🫖","Teapot"],["🫗",""],["🫘",""],["🫙",""],["🫚",""],["🫛",""],["🫜",""],["🫟",""]]}];
+    // Windows 10 自带的 Segoe UI Emoji 缺少 Emoji 13+ 的新码位，显示会变成「方框」。
+    // 这里剔除这些新增区段，只保留各平台都能正常渲染的安全子集（macOS / Windows 11 照常显示）。
+    const WINDOWS_UNSAFE_EMOJI_RANGES = [
+      [0x1FA00, 0x1FAFF], [0x1F7E0, 0x1F7EB], [0x1F6D5, 0x1F6D7], [0x1F6DC, 0x1F6DF], [0x1F6FA, 0x1F6FC],
+      [0x1F90C, 0x1F90C], [0x1F971, 0x1F972], [0x1F977, 0x1F978], [0x1F9A3, 0x1F9AD], [0x1F9CB, 0x1F9CC],
+    ];
+    const isWindowsSafeEmoji = (emoji) => {
+      for (const ch of emoji) {
+        const cp = ch.codePointAt(0);
+        if (WINDOWS_UNSAFE_EMOJI_RANGES.some(([a, b]) => cp >= a && cp <= b)) return false;
+      }
+      return true;
+    };
+    const EMOJI_GROUPS_SAFE = EMOJI_GROUPS
+      .map((group) => ({ ...group, items: group.items.filter(([emoji]) => isWindowsSafeEmoji(emoji)) }))
+      .filter((group) => group.items.length);
+    // 表情 → 名称映射（悬浮提示与按名称搜索用）。
+    const EMOJI_NAMES = new Map(EMOJI_GROUPS_SAFE.flatMap((group) => group.items).filter((item) => item[1]).map((item) => [item[0], item[1]]));
 
     // ===== 常量 =====
     const NS = 'workspaceTags';
@@ -72,8 +106,11 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     const STYLE_ID = 'dsh-ws-tags-style';
     const OVERLAY_ATTR = 'data-dsh-ws-tags-overlay';
     const DOTS_ATTR = 'data-dsh-ws-tags-dots';
+    const SESSION_ICON_ATTR = 'data-dsh-session-icon';
     const LOG = '[workspace-tags]';
     const ROW_PREFIX = 'workspace:'; // 工作区行的 data-row-key 前缀
+    const SESSION_PREFIX = 'session:'; // 对话行的 data-row-key 前缀
+    const STORE_VERSION = 1; // localStorage 数据结构版本号，便于以后升级迁移
 
     // 7 种预设色（红/橙/黄/绿/蓝/紫/灰），另加自定义取色盘。
     const PRESET_COLORS = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#0A84FF', '#AF52DE', '#8E8E93'];
@@ -106,6 +143,8 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     const SEL = Object.freeze({
       workspaceRow: 'div[data-row-key^="workspace:"]',
       projectText: '[class*="projectText"]',
+      sessionRow: 'div[data-row-key^="session:"]',
+      sessionTitle: '[class*="title"]',
     });
 
     // 文案：优先 locale 服务，缺失时回退中文。
@@ -128,6 +167,12 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         modeTip: '切换标签显示：首字 / 全称',
         stackBtnLabel: '堆',
         stackTip: '切换标签排列：平铺 / 堆叠',
+        iconMenu: '插入图标',
+        iconPickTitle: '为对话选择图标：',
+        iconSearch: '搜索图标',
+        recentLabel: '最近使用',
+        iconEmpty: '没有匹配的图标',
+        iconRemove: '移除图标',
       },
       en: {
         menu: 'Tags',
@@ -147,12 +192,20 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         modeTip: 'Toggle label: first character / full name',
         stackBtnLabel: 'Stack',
         stackTip: 'Toggle layout: flat / stacked',
+        iconMenu: 'Insert icon',
+        iconPickTitle: 'Choose an icon for:',
+        iconSearch: 'Search icons',
+        recentLabel: 'Recently used',
+        iconEmpty: 'No matching icon',
+        iconRemove: 'Remove icon',
       },
     });
 
     // ===== 小工具 =====
     const queryAll = (sel, root) => Array.from((root || document).querySelectorAll(sel));
     const warn = (error) => console.warn(LOG, error);
+    /** 执行清理等可选步骤时忽略异常，避免一个失败拖垮整体。 */
+    const safe = (fn) => { try { fn(); } catch (error) { warn(error); } };
 
     /** 创建元素：props 支持 class/文本/属性/事件（onXxx）。 */
     function el(tag, props, children) {
@@ -181,12 +234,14 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     function workspaceItems(workspaces) {
       const list = workspaces && workspaces.list;
       const snapshot = list && typeof list.getSnapshot === 'function' ? list.getSnapshot() : null;
-      return (snapshot && snapshot.items) || [];
+      const items = snapshot && snapshot.items;
+      return Array.isArray(items) ? items : [];
     }
 
     /** 按文件夹路径找到对应的工作区行元素（用于弹窗/圆点定位）。 */
     function workspaceRowFor(workspaces, path) {
-      const item = workspaceItems(workspaces).find((entry) => entry.path === path);
+      const key = normalizePath(path).toLowerCase();
+      const item = workspaceItems(workspaces).find((entry) => normalizePath(entry.path).toLowerCase() === key);
       return item ? document.querySelector(`div[data-row-key="${ROW_PREFIX}${item.workspaceId}"]`) : null;
     }
 
@@ -194,13 +249,61 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     const workspaceIdOf = (row) => (row.getAttribute('data-row-key') || '').slice(ROW_PREFIX.length);
 
     // ===== 数据：一个 JSON 存在 localStorage =====
-    // 结构：{ version:1, tags:{ [id]:{name,color} }, paths:{ [绝对路径]:[tagId,...] },
-    //         modes:{ [路径]:'first'|'full' }, stacks:{ [路径]:boolean } }
+    // 结构：{ version:1,
+    //   tags:{ [标签id]:{name,color} }, paths:{ [绝对路径]:[标签id,...] },
+    //   modes:{ [路径]:'first'|'full' }, stacks:{ [路径]:boolean },
+    //   sessionIcons:{ [对话id]:{type:'emoji',value} }, recentEmojis:[emoji,...] }
     /** 只接受普通对象，其余（null/数组/原始值）一律按空对象处理，用于容错解析。 */
     const asObject = (value) => (value && typeof value === 'object' && !Array.isArray(value) ? value : {});
+    const RECENT_LIMIT = 30;
+
+    // Windows 兼容：路径大小写不敏感、可能用反斜杠；统一成正斜杠并去掉末尾斜杠再比较。
+    const normalizePath = (value) => {
+      const path = String(value == null ? '' : value).replace(/\\/g, '/');
+      return path.length > 1 ? path.replace(/\/+$/, '') : path;
+    };
+    // 在「路径→值」表里找同一路径已存在的键：先精确匹配，再忽略大小写，避免同一文件夹被存成两份。
+    const findPathKey = (map, path) => {
+      const key = normalizePath(path);
+      if (Object.prototype.hasOwnProperty.call(map, key)) return key;
+      const lower = key.toLowerCase();
+      return Object.keys(map).find((item) => item.toLowerCase() === lower) || null;
+    };
+
+    // 下面几个 sanitize* 负责把「外部存储里的脏数据」洗成可信结构，避免运行时到处判断类型。
+    function sanitizePaths(value) {
+      const out = {};
+      Object.entries(asObject(value)).forEach(([path, ids]) => {
+        if (!Array.isArray(ids)) return;
+        const list = ids.filter((id) => typeof id === 'string' && id);
+        if (!list.length) return;
+        const key = normalizePath(path);
+        // 同一路径可能因大小写/分隔符不同出现多份记录，这里合并去重而不是简单覆盖。
+        out[key] = Array.from(new Set([...(out[key] || []), ...list]));
+      });
+      return out;
+    }
+    function sanitizeModes(value) {
+      const out = {};
+      Object.entries(asObject(value)).forEach(([path, mode]) => { if (mode === 'first' || mode === 'full') out[normalizePath(path)] = mode; });
+      return out;
+    }
+    function sanitizeStacks(value) {
+      const out = {};
+      Object.entries(asObject(value)).forEach(([path, stacked]) => { if (stacked === true) out[normalizePath(path)] = true; });
+      return out;
+    }
+    function sanitizeSessionIcons(value) {
+      const out = {};
+      Object.entries(asObject(value)).forEach(([id, icon]) => {
+        if (icon && icon.type === 'emoji' && typeof icon.value === 'string' && icon.value) out[id] = { type: 'emoji', value: icon.value };
+      });
+      return out;
+    }
+    const sanitizeRecent = (value) => (Array.isArray(value) ? value.filter((item) => typeof item === 'string' && item && isWindowsSafeEmoji(item)).slice(0, RECENT_LIMIT) : []);
 
     function emptyStore() {
-      return { version: 1, tags: withBuiltins({}), paths: {}, modes: {}, stacks: {} };
+      return { version: STORE_VERSION, tags: withBuiltins({}), paths: {}, modes: {}, stacks: {}, sessionIcons: {}, recentEmojis: [] };
     }
 
     /** 把内置颜色标签并进现有标签表；同名已存在则跳过，避免重复。 */
@@ -219,11 +322,13 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         if (!raw) return emptyStore();
         const data = JSON.parse(raw);
         return {
-          version: 1,
+          version: STORE_VERSION,
           tags: withBuiltins(asObject(data && data.tags)),
-          paths: asObject(data && data.paths),
-          modes: asObject(data && data.modes),
-          stacks: asObject(data && data.stacks),
+          paths: sanitizePaths(data && data.paths),
+          modes: sanitizeModes(data && data.modes),
+          stacks: sanitizeStacks(data && data.stacks),
+          sessionIcons: sanitizeSessionIcons(data && data.sessionIcons),
+          recentEmojis: sanitizeRecent(data && data.recentEmojis),
         };
       } catch (error) {
         warn(error);
@@ -241,10 +346,26 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
 
     let store = loadStore();
 
+    // 该路径在 paths/modes/stacks 三张表里的统一键（优先复用已存在的键，保证读写落到同一处）。
+    const pathKeyOf = (path) => {
+      const key = normalizePath(path);
+      for (const map of [store.paths, store.modes, store.stacks]) {
+        const found = findPathKey(map, key);
+        if (found) return found;
+      }
+      return key;
+    };
+
     /** 删掉没有任何文件夹引用的标签（满足「解除全部绑定才消失」）。 */
     function pruneOrphanTags() {
+      // 先清掉路径里指向已不存在标签的 id，避免旧数据残留。
       const used = new Set();
-      Object.values(store.paths).forEach((ids) => Array.isArray(ids) && ids.forEach((id) => used.add(id)));
+      Object.keys(store.paths).forEach((path) => {
+        const ids = (Array.isArray(store.paths[path]) ? store.paths[path] : []).filter((id) => store.tags[id]);
+        if (ids.length) { store.paths[path] = ids; ids.forEach((id) => used.add(id)); }
+        else delete store.paths[path];
+      });
+      // 再删掉没有任何文件夹引用的标签（内置标签始终保留）。
       Object.keys(store.tags).forEach((id) => {
         if (!used.has(id) && !BUILTIN_IDS.has(id)) delete store.tags[id];
       });
@@ -252,10 +373,10 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
 
     /** 按当前工作区列表清理失效路径记录；返回是否有变化。需在列表就绪后调用。 */
     function pruneForWorkspaces(items) {
-      const alive = new Set(items.map((item) => item.path));
+      const alive = new Set(items.map((item) => normalizePath(item.path).toLowerCase()));
       let changed = false;
       Object.keys(store.paths).forEach((path) => {
-        if (!alive.has(path)) {
+        if (!alive.has(normalizePath(path).toLowerCase())) {
           delete store.paths[path];
           delete store.modes[path];
           delete store.stacks[path];
@@ -309,6 +430,9 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         .dwst-search{width:100%;height:30px;box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm,8px);
           background:var(--dsw-alias-bg-layer-2,transparent);color:var(--dsw-alias-label-primary);padding:0 9px;font-size:13px;outline:none;font-family:inherit;margin-bottom:6px;}
         .dwst-search:focus{border-color:var(--dsw-alias-state-business-primary);}
+        /* 键盘可达性：聚焦时给出清晰的品牌色描边（鼠标点击不显示，避免干扰视觉）。 */
+        .dwst-pop button:focus-visible,.dwst-pop input:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:1px;}
+        @media (prefers-reduced-motion:reduce){.dwst-dot,.dwst-dots .dwst-dot:not(:first-child){transition:none!important;}}
         .dwst-list{overflow:auto;flex:1;min-height:0;max-height:300px;display:flex;flex-direction:column;gap:1px;}
         .dwst-rowbtn{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:none;background:transparent;
           color:var(--dsw-alias-label-primary);cursor:pointer;padding:6px 8px;border-radius:var(--dsw-radius-sm,8px);font-size:13px;font-family:inherit;}
@@ -358,21 +482,44 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
           animation:dwstTipIn .15s var(--ds-ease-in-out);}
         @keyframes dwstTipIn{0%{opacity:0}}
         @media (prefers-reduced-motion:reduce){.dwst-dot-tip{animation:none}}
+        .dwst-sicon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin:0 0 0 var(--dsh-sidebar-label-gap);flex:0 0 auto;color:var(--dsw-alias-label-secondary);pointer-events:none;}
+        .dwst-sicon .dwst-emoji{font-size:15px;line-height:1;}
+        .dwst-sicon svg{width:15px;height:15px;}
+        .dwst-group-title{padding:6px 6px 4px;font-size:12px;color:var(--dsw-alias-label-secondary);}
+        .dwst-icon-grid{display:flex;flex-wrap:wrap;gap:4px;padding:0 2px 6px;}
+        .dwst-recent{flex:0 0 auto;min-height:40px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;padding-bottom:4px;}
+        .dwst-recent .dwst-icon-cell{flex:0 0 auto;}
+        .dwst-icon-cell{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid transparent;border-radius:var(--dsw-radius-sm,6px);background:transparent;color:var(--dsw-alias-label-primary);cursor:pointer;font-size:19px;line-height:1;}
+        .dwst-icon-cell:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(128,128,128,.12));}
+        .dwst-icon-cell.is-on{border-color:var(--dsw-alias-state-business-primary);background:var(--dsw-alias-interactive-bg-hover,rgba(128,128,128,.12));}
+        .dwst-icon-cell svg{width:20px;height:20px;}
+        .dwst-emoji{font-size:19px;line-height:1;}
+        .dwst-remove-btn{flex:0 0 auto;height:22px;padding:0 8px;border:1px solid var(--dsw-alias-border-l1);background:transparent;color:var(--dsw-alias-state-error-primary,var(--dsw-alias-state-error));border-radius:var(--dsw-radius-sm,6px);font-size:12px;font-family:inherit;cursor:pointer;}
+        .dwst-remove-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(128,128,128,.12));}
+        .dwst-empty{padding:10px 6px;color:var(--dsw-alias-label-secondary);font-size:12px;text-align:center;}
       `;
       document.head.appendChild(style);
     }
 
     // ===== 工作区行标签的小提示（hover 显示单个标签全称）=====
     let tipEl = null;
-    function showTip(dot, text) {
+    let tipScrollHandler = null;
+    function showTip(target, text) {
       hideTip();
       tipEl = el('div', { class: 'dwst-dot-tip', text });
       document.body.appendChild(tipEl);
-      const rect = dot.getBoundingClientRect();
+      // 页面滚动时元素位置会变，直接收起提示，避免提示“飘”在原地。
+      tipScrollHandler = () => hideTip();
+      window.addEventListener('scroll', tipScrollHandler, true);
+      const rect = target.getBoundingClientRect();
+      // 默认显示在元素上方；若上方空间不足（如贴近窗口顶部），改为显示在下方。
+      const below = rect.top - tipEl.offsetHeight - 6 < 8;
       tipEl.style.left = Math.round(rect.left + rect.width / 2) + 'px';
-      tipEl.style.top = Math.round(rect.top - 6) + 'px';
+      tipEl.style.top = Math.round(below ? rect.bottom + 6 : rect.top - 6) + 'px';
+      if (below) tipEl.style.transform = 'translate(-50%, 0)';
     }
     function hideTip() {
+      if (tipScrollHandler) { window.removeEventListener('scroll', tipScrollHandler, true); tipScrollHandler = null; }
       if (tipEl) { tipEl.remove(); tipEl = null; }
     }
     // 给任意元素绑定与工作区标签一致的悬浮提示（DSH 设计规范气泡样式）。
@@ -398,11 +545,14 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
       setTimeout(() => { dot.style.width = ''; dot.style.transition = ''; }, 200);
     }
 
+    /** 把标签圆牌画到工作区行标题前：集合变化才重建节点，仅改模式/堆叠时用 class 与宽度过渡。 */
     function paintDots(workspaces) {
       const pathById = new Map(workspaceItems(workspaces).map((item) => [item.workspaceId, item.path]));
       queryAll(SEL.workspaceRow).forEach((row) => {
-        const path = pathById.get(workspaceIdOf(row));
-        const ids = (path && Array.isArray(store.paths[path]) ? store.paths[path] : []);
+        const rawPath = pathById.get(workspaceIdOf(row));
+        const path = rawPath && pathKeyOf(rawPath);
+        // 过滤掉已不存在的标签 id，保证后面的 box.children 与 ids 一一对应。
+        const ids = (path && Array.isArray(store.paths[path]) ? store.paths[path] : []).filter((id) => store.tags[id]);
         let box = row.querySelector('[' + DOTS_ATTR + ']');
         if (!ids.length) {
           if (box) box.remove();
@@ -438,9 +588,35 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
           });
         }
         box.dataset.mode = mode;
-        box.classList.toggle('is-full', mode === 'full');
         box.classList.toggle('is-stacked', stacked);
         const anchor = row.querySelector(SEL.projectText);
+        if (anchor) {
+          if (box.parentNode !== row || box.nextSibling !== anchor) row.insertBefore(box, anchor);
+        } else if (box.parentNode !== row) {
+          row.insertBefore(box, row.firstChild);
+        }
+      });
+    }
+
+    // ===== 对话行前的自定义图标 =====
+    /** 把 Emoji 图标画到对话行标题前；无图标或非 Emoji 时移除。 */
+    function paintSessionIcons() {
+      queryAll(SEL.sessionRow).forEach((row) => {
+        const sessionId = (row.getAttribute('data-row-key') || '').slice(SESSION_PREFIX.length);
+        const icon = sessionId ? store.sessionIcons[sessionId] : null;
+        let box = row.querySelector('[' + SESSION_ICON_ATTR + ']');
+        // 只支持表情图标；没有或不是表情则移除。
+        if (!icon || icon.type !== 'emoji' || !icon.value) {
+          if (box) box.remove();
+          return;
+        }
+        if (!box) box = el('span', { class: 'dwst-sicon', [SESSION_ICON_ATTR]: '' });
+        if (box.dataset.sig !== icon.value) {
+          box.dataset.sig = icon.value;
+          box.textContent = '';
+          box.appendChild(el('span', { class: 'dwst-emoji', text: icon.value }));
+        }
+        const anchor = row.querySelector(SEL.sessionTitle);
         if (anchor) {
           if (box.parentNode !== row || box.nextSibling !== anchor) row.insertBefore(box, anchor);
         } else if (box.parentNode !== row) {
@@ -452,11 +628,178 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     // ===== 打标签下拉框（参考 macOS 的标签选择器）=====
     let closeActiveDialog = null;
 
+    /**
+     * 统一浮层：遮罩、Esc 关闭、跟随锚点定位、容器高度过渡都在这里，
+     * 打标签弹窗与对话图标弹窗共用，避免重复代码。
+     * @param {{caption:string, anchor:()=>Element|null, onEscape?:()=>boolean, onClose?:()=>void}} options
+     */
+    function createPopover({ caption, anchor, onEscape, onClose }) {
+      const pop = el('div', { class: 'dwst-pop', role: 'dialog', 'aria-label': caption });
+      const head = el('div', { class: 'dwst-head' }, [el('div', { class: 'dwst-caption', text: caption })]);
+      const body = el('div', { class: 'dwst-body' });
+      pop.appendChild(head);
+      pop.appendChild(body);
+
+      const overlay = el('div', { [OVERLAY_ATTR]: '' }, [pop]);
+      overlay.addEventListener('pointerdown', (event) => { if (event.target === overlay) close(); });
+
+      /** 跟随锚点定位，并把容器高度从旧值过渡到新值（内容增减有动画）。 */
+      function place() {
+        if (!pop.isConnected) return;
+        const margin = 8;
+        const width = pop.offsetWidth || 268;
+        const startHeight = pop.offsetHeight;
+        pop.style.height = 'auto';
+        const endHeight = pop.offsetHeight;
+        const row = typeof anchor === 'function' ? anchor() : null;
+        let left = (window.innerWidth - width) / 2;
+        let top = Math.max(margin, window.innerHeight / 3);
+        if (row) {
+          const rect = row.getBoundingClientRect();
+          left = rect.right + margin;
+          top = rect.top;
+        }
+        left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+        top = Math.max(margin, Math.min(top, window.innerHeight - endHeight - margin));
+        pop.style.left = left + 'px';
+        pop.style.top = top + 'px';
+        pop.style.height = startHeight + 'px';
+        void pop.offsetHeight;
+        pop.style.height = endHeight + 'px';
+      }
+
+      function onKey(event) {
+        if (event.key !== 'Escape') return;
+        event.stopPropagation();
+        if (typeof onEscape === 'function' && onEscape()) return;
+        close();
+      }
+
+      function close() {
+        document.removeEventListener('keydown', onKey, true);
+        hideTip();
+        if (typeof onClose === 'function') onClose();
+        overlay.remove();
+        if (closeActiveDialog === close) closeActiveDialog = null;
+      }
+
+      function mount() {
+        document.body.appendChild(overlay);
+        document.addEventListener('keydown', onKey, true);
+        place();
+        closeActiveDialog = close;
+      }
+
+      return { pop, head, body, place, close, mount };
+    }
+
+    /**
+     * 打标签弹窗顶部的控制按钮：清空（含二次确认气泡）、首/全、平铺/堆叠。
+     * 与弹窗组装分离，openDialog 只负责组合节点与生命周期。
+     */
+    function createFolderControls({ path, t, repaint, selected, refresh }) {
+      // 「清空当前文件夹全部标签」按钮：点击时用 morphicons 让垃圾桶盖子打开→合上。
+      const trashSvg = svgEl('svg', {
+        xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24',
+        fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+      });
+      const trashPath = svgEl('path', { d: '' });
+      trashSvg.appendChild(trashPath);
+      const trashBtn = el('button', { type: 'button', class: 'dwst-trash', 'aria-label': t('clearAll') }, [trashSvg]);
+      let trashCtrl = null;
+      try { trashCtrl = morph(trashPath, TRASH_CLOSED, { strokeWidth: 1.8, reducedMotion: 'user' }); }
+      catch (error) { warn(error); }
+      let clearing = false;
+      // 真正执行清空：垃圾桶盖子打开 → 清空当前文件夹标签 → 合上。
+      function doClear() {
+        if (clearing) return;
+        clearing = true;
+        try { if (trashCtrl) trashCtrl.morphTo(TRASH_OPEN, 'snappy'); } catch (error) { warn(error); } // 盖子打开
+        selected.clear(); // 只清空当前文件夹：清空已选集合并立即落盘
+        refresh(false);
+        setTimeout(() => {
+          try { if (trashCtrl) trashCtrl.morphTo(TRASH_CLOSED, 'snappy'); } catch (error) { warn(error); } // 盖子合上
+          clearing = false;
+        }, 240);
+      }
+
+      // 二次确认气泡（Popconfirm）：点垃圾桶先弹出，确认后才清空。
+      const confirmCancelBtn = el('button', { type: 'button', class: 'dwst-confirm-btn', text: t('confirmCancel') });
+      const confirmOkBtn = el('button', { type: 'button', class: 'dwst-confirm-btn dwst-danger', text: t('confirmOk') });
+      const confirmEl = el('div', { class: 'dwst-confirm', role: 'dialog' }, [
+        el('div', { class: 'dwst-confirm-text', text: t('confirmText') }),
+        el('div', { class: 'dwst-confirm-actions' }, [confirmCancelBtn, confirmOkBtn]),
+      ]);
+      const onDocDown = (event) => {
+        if (!confirmEl.contains(event.target) && !trashBtn.contains(event.target)) hideConfirm();
+      };
+      function hideConfirm() {
+        confirmEl.classList.remove('is-open');
+        document.removeEventListener('pointerdown', onDocDown, true);
+      }
+      function showConfirm() {
+        confirmEl.classList.add('is-open'); // 先显示，才能量尺寸定位
+        const rect = trashBtn.getBoundingClientRect();
+        const width = confirmEl.offsetWidth;
+        const height = confirmEl.offsetHeight;
+        const left = Math.min(Math.max(8, rect.right - width), window.innerWidth - width - 8);
+        let top = rect.bottom + 6;
+        if (top + height > window.innerHeight - 8) top = rect.top - height - 6; // 下方放不下就放上方
+        confirmEl.style.left = left + 'px';
+        confirmEl.style.top = Math.max(8, top) + 'px';
+        document.addEventListener('pointerdown', onDocDown, true);
+      }
+      confirmCancelBtn.addEventListener('click', hideConfirm);
+      confirmOkBtn.addEventListener('click', () => { hideConfirm(); doClear(); });
+      trashBtn.addEventListener('click', () => {
+        hideTip();
+        if (confirmEl.classList.contains('is-open')) hideConfirm();
+        else showConfirm();
+      });
+      bindTip(trashBtn, () => t('clearAll'));
+
+      // 「首 / 全」单按钮切换：决定这个文件夹在工作区行上的标签显示「首字」还是「全称」，按文件夹记住。
+      const modeBtn = el('button', { type: 'button', class: 'dwst-mode-btn' });
+      const paintMode = () => {
+        const first = store.modes[path] === 'first'; // 默认「全」，只有选了「首」才高亮
+        modeBtn.textContent = t('modeBtnLabel'); // 文字固定「首」，不随状态变化
+        modeBtn.classList.toggle('is-on', first);
+        modeBtn.setAttribute('aria-pressed', first ? 'true' : 'false');
+      };
+      modeBtn.addEventListener('click', () => {
+        store.modes[path] = store.modes[path] === 'first' ? 'full' : 'first';
+        saveStore();
+        repaint(); // 立即重画工作区行上的标签
+        paintMode();
+      });
+      paintMode();
+      bindTip(modeBtn, () => t('modeTip'));
+
+      // 「是否堆叠」单按钮切换：多个标签是否叠在一起（默认不堆叠）。
+      const stackBtn = el('button', { type: 'button', class: 'dwst-mode-btn' });
+      const paintStack = () => {
+        const stacked = store.stacks[path] === true;
+        stackBtn.textContent = t('stackBtnLabel'); // 文字固定「堆」，不随状态变化
+        stackBtn.classList.toggle('is-on', stacked);
+        stackBtn.setAttribute('aria-pressed', stacked ? 'true' : 'false');
+      };
+      stackBtn.addEventListener('click', () => {
+        store.stacks[path] = store.stacks[path] !== true;
+        saveStore();
+        repaint();
+        paintStack();
+      });
+      paintStack();
+      bindTip(stackBtn, () => t('stackTip'));
+
+      return { modeBtn, stackBtn, trashBtn, confirmEl, hideConfirm };
+    }
+
     function openDialog(ctx, target, repaint) {
       if (!target || !target.path) return;
       if (closeActiveDialog) closeActiveDialog();
       const t = translator(ctx);
-      const path = target.path;
+      const path = pathKeyOf(target.path);
 
       // 已选集合：直接操作真实 store，点一下即生效（mac 的交互，无「保存」按钮）。
       const selected = new Set(store.paths[path] || []);
@@ -577,19 +920,8 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         activeIndex = (activeIndex + delta + activeRows.length) % activeRows.length;
         paintActive();
       }
-      function render() {
-        list.textContent = '';
-        enterCreate = false; // 重新渲染（改搜索词等）后清除「选色待创建」状态
-        const q = search.value.trim();
-        const ql = q.toLowerCase();
-        // 已选标签按「当前保存的顺序」展示（拖动即可调整，顺序会同步到工作区行圆牌），不受搜索影响。
-        const chosenIds = Array.from(selected).filter((id) => store.tags[id]);
-        const rest = Object.entries(store.tags)
-          .filter(([id, tag]) => !selected.has(id) && (!ql || tag.name.toLowerCase().includes(ql)))
-          .sort((a, b) => a[1].name.localeCompare(b[1].name, 'zh'));
-
-        // 上：已选标签横向排列在搜索框上方（可拖拽排序），空则给灰字提示。
-        // 先记下改动前每个胶囊的位置，稍后用 FLIP 做「新增 / 删除 / 拖拽排序」的平滑动画。
+      /** 上：已选标签横向排列在搜索框上方，可拖拽排序；用 FLIP 让新增/删除/排序有平滑动画。 */
+      function renderChosen(chosenIds) {
         const firstRects = new Map();
         chosenBar.querySelectorAll('.dwst-chip').forEach((node) => {
           const id = node.getAttribute('data-id');
@@ -599,7 +931,6 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         chosenBar.textContent = '';
         if (chosenIds.length) chosenIds.forEach((id) => chosenBar.appendChild(chip(id, store.tags[id])));
         else chosenBar.appendChild(el('div', { class: 'dwst-none', text: t('chosenEmpty') }));
-        // FLIP：老胶囊从旧位置滑到新位置；新出现的胶囊淡入放大。
         chosenBar.querySelectorAll('.dwst-chip').forEach((node) => {
           const id = node.getAttribute('data-id');
           const first = id ? firstRects.get(id) : null;
@@ -614,62 +945,79 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
           node.style.transition = 'transform .2s cubic-bezier(.2,.8,.3,1)';
           node.style.transform = '';
         });
+      }
 
-        // 下：可选标签列表，空则给灰字提示。
+      /** 下：可选标签列表（按名称排序）。 */
+      function renderAvailable(rest) {
         list.appendChild(el('div', { class: 'dwst-group', text: t('availableLabel') }));
-        activeRows = [];
-        if (rest.length) rest.forEach(([id, tag]) => {
+        if (!rest.length) { list.appendChild(el('div', { class: 'dwst-none', text: t('availableEmpty') })); return; }
+        rest.forEach(([id, tag]) => {
           const row = tagRow(id, tag);
           list.appendChild(row);
           activeRows.push({ node: row, run: () => row.click() });
         });
-        else list.appendChild(el('div', { class: 'dwst-none', text: t('availableEmpty') }));
+      }
 
-        // 输入的文字没有完全同名的标签时：展示「创建新标签」行 + 可选颜色。
-        // 选颜色只是「预选」（高亮），真正新建要：点蓝色这一行，或按回车确认。
-        const exact = q && Object.values(store.tags).some((tag) => tag.name.toLowerCase() === ql);
-        if (q && !exact) {
-          const createBtn = el('button', { type: 'button', class: 'dwst-create', title: t('createPrefix') }, [
-            circle('', false),
-            el('span', { text: `${t('createPrefix')} “${q}”` }),
-          ]);
-          createBtn.addEventListener('click', () => createFromInput(q, pickedColor));
-          list.appendChild(createBtn);
-          activeRows.push({ node: createBtn, run: () => createBtn.click() });
+      /** 输入文字且无完全同名标签时，追加「创建新标签」行与颜色选择（选色≠新建，确认才建）。 */
+      function renderCreateRow(q, ql) {
+        if (!q || Object.values(store.tags).some((tag) => tag.name.toLowerCase() === ql)) return;
+        const createBtn = el('button', { type: 'button', class: 'dwst-create', title: t('createPrefix') }, [
+          circle('', false),
+          el('span', { text: `${t('createPrefix')} “${q}”` }),
+        ]);
+        createBtn.addEventListener('click', () => createFromInput(q, pickedColor));
+        list.appendChild(createBtn);
+        activeRows.push({ node: createBtn, run: () => createBtn.click() });
 
-          const colors = el('div', { class: 'dwst-colors' });
-          // ✕：取消这次新建（清空输入）。
-          const cx = el('button', { type: 'button', class: 'dwst-cx', text: '×', title: t('cancelNew') });
-          cx.addEventListener('click', (event) => { event.stopPropagation(); search.value = ''; render(); search.focus(); });
-          colors.appendChild(cx);
-          // 7 个预设色：点一下只是选中颜色，不直接新建。
-          const presetEls = PRESET_COLORS.map((color) => {
-            const sw = el('button', { type: 'button', class: 'dwst-mini', title: color });
-            sw.style.background = color;
-            sw.addEventListener('mousedown', (event) => event.preventDefault()); // 不抢焦点，保持搜索框可回车
-            sw.addEventListener('click', (event) => { event.stopPropagation(); pickedColor = color; enterCreate = true; paintColor(); search.focus(); });
-            colors.appendChild(sw);
-            return sw;
-          });
-          // 自定义颜色：同样只选中。
-          const custom = el('input', { type: 'color', class: 'dwst-mini dwst-mini-custom', title: t('customColor') });
-          custom.addEventListener('input', () => { pickedColor = custom.value; enterCreate = true; paintColor(); });
-          custom.addEventListener('change', () => search.focus()); // 选完自定义色回到搜索框，可回车创建
-          colors.appendChild(custom);
-          function paintColor() {
-            presetEls.forEach((sw, index) => sw.classList.toggle('is-on', PRESET_COLORS[index].toLowerCase() === pickedColor.toLowerCase()));
-            custom.classList.toggle('is-on', !PRESET_COLORS.some((color) => color.toLowerCase() === pickedColor.toLowerCase()));
-            custom.value = pickedColor;
-          }
-          paintColor();
-          list.appendChild(colors);
+        const colors = el('div', { class: 'dwst-colors' });
+        const cx = el('button', { type: 'button', class: 'dwst-cx', text: '×', title: t('cancelNew') }); // 取消这次新建
+        cx.addEventListener('click', (event) => { event.stopPropagation(); search.value = ''; render(); search.focus(); });
+        colors.appendChild(cx);
+        // 7 个预设色：点一下只是选中颜色，不直接新建；mousedown 阻止默认以免抢走搜索框焦点。
+        const presetEls = PRESET_COLORS.map((color) => {
+          const sw = el('button', { type: 'button', class: 'dwst-mini', title: color });
+          sw.style.background = color;
+          sw.addEventListener('mousedown', (event) => event.preventDefault());
+          sw.addEventListener('click', (event) => { event.stopPropagation(); pickedColor = color; enterCreate = true; paintColor(); search.focus(); });
+          colors.appendChild(sw);
+          return sw;
+        });
+        const custom = el('input', { type: 'color', class: 'dwst-mini dwst-mini-custom', title: t('customColor') });
+        custom.addEventListener('input', () => { pickedColor = custom.value; enterCreate = true; paintColor(); });
+        custom.addEventListener('change', () => search.focus());
+        colors.appendChild(custom);
+        function paintColor() {
+          presetEls.forEach((sw, index) => sw.classList.toggle('is-on', PRESET_COLORS[index].toLowerCase() === pickedColor.toLowerCase()));
+          custom.classList.toggle('is-on', !PRESET_COLORS.some((color) => color.toLowerCase() === pickedColor.toLowerCase()));
+          custom.value = pickedColor;
         }
+        paintColor();
+        list.appendChild(colors);
+      }
+
+      function render() {
+        list.textContent = '';
+        enterCreate = false; // 重新渲染（改搜索词等）后清除「选色待创建」状态
+        const q = search.value.trim();
+        const ql = q.toLowerCase();
+        // 已选按保存顺序展示（拖动可调，顺序同步到工作区行圆牌），不受搜索影响。
+        const chosenIds = Array.from(selected).filter((id) => store.tags[id]);
+        const rest = Object.entries(store.tags)
+          .filter(([id, tag]) => !selected.has(id) && (!ql || tag.name.toLowerCase().includes(ql)))
+          .sort((a, b) => a[1].name.localeCompare(b[1].name, 'zh'));
+
+        renderChosen(chosenIds);
+        activeRows = [];
+        renderAvailable(rest);
+        renderCreateRow(q, ql);
+
         // 搜索时默认高亮第一项；未搜索时不预高亮。
         activeRows.forEach((row, index) => row.node.addEventListener('mouseenter', () => { activeIndex = index; paintActive(); }));
         activeIndex = q ? 0 : -1;
         paintActive();
         place(); // 内容变化后重新定位，避免底部被裁掉
       }
+
       search.addEventListener('input', render);
       // 回车 = 确认新建（有待建文字且没有同名标签时才生效）。
       // 键盘：↑↓ 切换高亮项，回车执行当前高亮项（第一项默认高亮）。
@@ -686,172 +1034,99 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         row.run();
       });
 
-      // 「清空当前文件夹全部标签」按钮：点击时用 morphicons 让垃圾桶盖子打开→合上。
-      const trashSvg = svgEl('svg', {
-        xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24',
-        fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+
+
+      const { modeBtn, stackBtn, trashBtn, confirmEl, hideConfirm } = createFolderControls({ path, t, repaint, selected, refresh });
+
+      // 统一浮层：头部依次是标题、首/全、堆/平、清空按钮；主体依次是已选胶囊、搜索、可选列表。
+      const popover = createPopover({
+        caption: `${t('assignTitle')} “${target.title || path}”`,
+        anchor: () => workspaceRowFor(ctx.workspaces || ctx.get('workspaces'), path),
+        onEscape: () => (confirmEl.classList.contains('is-open') ? (hideConfirm(), true) : false),
+        onClose: () => {
+          try { if (sortable) sortable.destroy(); } catch (error) { /* 已销毁则忽略 */ }
+          hideConfirm();
+          confirmEl.remove();
+        },
       });
-      const trashPath = svgEl('path', { d: '' });
-      trashSvg.appendChild(trashPath);
-      const trashBtn = el('button', { type: 'button', class: 'dwst-trash', 'aria-label': t('clearAll') }, [trashSvg]);
-      let trashCtrl = null;
-      try { trashCtrl = morph(trashPath, TRASH_CLOSED, { strokeWidth: 1.8, reducedMotion: 'user' }); }
-      catch (error) { warn(error); }
-      let clearing = false;
-      // 真正执行清空：垃圾桶盖子打开 → 清空当前文件夹标签 → 合上。
-      function doClear() {
-        if (clearing) return;
-        clearing = true;
-        if (trashCtrl) trashCtrl.morphTo(TRASH_OPEN, 'snappy'); // 盖子打开
-        selected.clear(); // 只清空当前文件夹：清空已选集合并立即落盘
-        refresh(false);
-        setTimeout(() => {
-          if (trashCtrl) trashCtrl.morphTo(TRASH_CLOSED, 'snappy'); // 盖子合上
-          clearing = false;
-        }, 240);
-      }
-
-      // 二次确认气泡（Popconfirm）：点垃圾桶先弹出，确认后才清空。
-      const confirmCancelBtn = el('button', { type: 'button', class: 'dwst-confirm-btn', text: t('confirmCancel') });
-      const confirmOkBtn = el('button', { type: 'button', class: 'dwst-confirm-btn dwst-danger', text: t('confirmOk') });
-      const confirmEl = el('div', { class: 'dwst-confirm', role: 'dialog' }, [
-        el('div', { class: 'dwst-confirm-text', text: t('confirmText') }),
-        el('div', { class: 'dwst-confirm-actions' }, [confirmCancelBtn, confirmOkBtn]),
-      ]);
-      const onDocDown = (event) => {
-        if (!confirmEl.contains(event.target) && !trashBtn.contains(event.target)) hideConfirm();
-      };
-      function hideConfirm() {
-        confirmEl.classList.remove('is-open');
-        document.removeEventListener('pointerdown', onDocDown, true);
-      }
-      function showConfirm() {
-        confirmEl.classList.add('is-open'); // 先显示，才能量尺寸定位
-        const rect = trashBtn.getBoundingClientRect();
-        const width = confirmEl.offsetWidth;
-        const height = confirmEl.offsetHeight;
-        const left = Math.min(Math.max(8, rect.right - width), window.innerWidth - width - 8);
-        let top = rect.bottom + 6;
-        if (top + height > window.innerHeight - 8) top = rect.top - height - 6; // 下方放不下就放上方
-        confirmEl.style.left = left + 'px';
-        confirmEl.style.top = Math.max(8, top) + 'px';
-        document.addEventListener('pointerdown', onDocDown, true);
-      }
-      confirmCancelBtn.addEventListener('click', hideConfirm);
-      confirmOkBtn.addEventListener('click', () => { hideConfirm(); doClear(); });
-      trashBtn.addEventListener('click', () => {
-        hideTip();
-        if (confirmEl.classList.contains('is-open')) hideConfirm();
-        else showConfirm();
-      });
-      bindTip(trashBtn, () => t('clearAll'));
-
-      // 「首 / 全」单按钮切换：决定这个文件夹在工作区行上的标签显示「首字」还是「全称」，按文件夹记住。
-      const modeBtn = el('button', { type: 'button', class: 'dwst-mode-btn' });
-      const paintMode = () => {
-        const first = store.modes[path] === 'first'; // 默认「全」，只有选了「首」才高亮
-        modeBtn.textContent = t('modeBtnLabel'); // 文字固定「首」，不随状态变化
-        modeBtn.classList.toggle('is-on', first);
-        modeBtn.setAttribute('aria-pressed', first ? 'true' : 'false');
-      };
-      modeBtn.addEventListener('click', () => {
-        store.modes[path] = store.modes[path] === 'first' ? 'full' : 'first';
-        saveStore();
-        repaint(); // 立即重画工作区行上的标签
-        paintMode();
-      });
-      paintMode();
-      bindTip(modeBtn, () => t('modeTip'));
-
-      // 「是否堆叠」单按钮切换：多个标签是否叠在一起（默认不堆叠）。
-      const stackBtn = el('button', { type: 'button', class: 'dwst-mode-btn' });
-      const paintStack = () => {
-        const stacked = store.stacks[path] === true;
-        stackBtn.textContent = t('stackBtnLabel'); // 文字固定「堆」，不随状态变化
-        stackBtn.classList.toggle('is-on', stacked);
-        stackBtn.setAttribute('aria-pressed', stacked ? 'true' : 'false');
-      };
-      stackBtn.addEventListener('click', () => {
-        store.stacks[path] = store.stacks[path] !== true;
-        saveStore();
-        repaint();
-        paintStack();
-      });
-      paintStack();
-      bindTip(stackBtn, () => t('stackTip'));
-
-      const pop = el('div', { class: 'dwst-pop', role: 'dialog' }, [
-        el('div', { class: 'dwst-head' }, [
-          el('div', { class: 'dwst-caption', text: `${t('assignTitle')} “${target.title || path}”` }),
-          modeBtn,
-          stackBtn,
-          trashBtn,
-        ]),
-        el('div', { class: 'dwst-body' }, [chosenBar, search, list]),
-      ]);
-
-      const overlay = el('div', { [OVERLAY_ATTR]: '' }, [pop]);
-      overlay.addEventListener('pointerdown', (event) => {
-        if (event.target === overlay) close();
-      });
-
-      // 定位 + 高度动画：所有内容都收在 .dwst-pop 里，内容增减时容器平滑过渡。
-      function place() {
-        if (!pop || !pop.isConnected) return; // 尚未挂载时跳过
-        const margin = 8;
-        const popWidth = pop.offsetWidth || 268;
-        // 先按内容「自然高度」量一次，再过渡到该高度（容器变化带动画）。
-        const startHeight = pop.offsetHeight;
-        pop.style.height = 'auto';
-        const endHeight = pop.offsetHeight;
-
-        // 用最终高度算定位，保证贴底时整体上移、不被裁切。
-        const row = workspaceRowFor(ctx.get('workspaces'), path);
-        let left;
-        let top;
-        if (row) {
-          const rect = row.getBoundingClientRect();
-          left = rect.right + margin;
-          top = rect.top;
-        } else {
-          left = (window.innerWidth - popWidth) / 2;
-          top = Math.max(margin, window.innerHeight / 3);
-        }
-        left = Math.max(margin, Math.min(left, window.innerWidth - popWidth - margin));
-        top = Math.min(top, window.innerHeight - endHeight - margin);
-        top = Math.max(margin, top);
-        pop.style.left = left + 'px';
-        pop.style.top = top + 'px';
-
-        // 高度从旧值过渡到新值，触发平移动画。
-        pop.style.height = startHeight + 'px';
-        void pop.offsetHeight;
-        pop.style.height = endHeight + 'px';
-      }
-
-      const onKey = (event) => {
-        if (event.key !== 'Escape') return;
-        event.stopPropagation();
-        if (confirmEl.classList.contains('is-open')) hideConfirm(); // 先关确认气泡
-        else close();
-      };
-      document.addEventListener('keydown', onKey, true);
-
-      function close() {
-        document.removeEventListener('keydown', onKey, true);
-        hideTip();
-        try { if (sortable) sortable.destroy(); } catch (error) { /* 已销毁则忽略 */ }
-        hideConfirm();
-        confirmEl.remove();
-        overlay.remove();
-        if (closeActiveDialog === close) closeActiveDialog = null;
-      }
+      [modeBtn, stackBtn, trashBtn].forEach((node) => popover.head.appendChild(node));
+      [chosenBar, search, list].forEach((node) => popover.body.appendChild(node));
+      const place = popover.place; // render() 内容变化后重新定位用
 
       render();
-      document.body.appendChild(overlay);
       document.body.appendChild(confirmEl);
-      place();
-      closeActiveDialog = close;
+      popover.mount();
+      search.focus();
+    }
+
+    // ===== 对话图标选择框（定位与动画同打标签弹窗；只提供 Emoji）=====
+    function openSessionIconPicker(ctx, target, repaint) {
+      if (!target || !target.sessionId) return;
+      if (closeActiveDialog) closeActiveDialog();
+      const t = translator(ctx);
+      const sessionId = target.sessionId;
+      const current = store.sessionIcons[sessionId] || null;
+      const currentEmoji = current && current.type === 'emoji' ? current.value : null;
+
+      const search = el('input', { class: 'dwst-search', type: 'text', placeholder: t('iconSearch'), 'aria-label': t('iconSearch') });
+      const list = el('div', { class: 'dwst-list' });
+
+      const popover = createPopover({
+        caption: `${t('iconPickTitle')} “${target.title || sessionId}”`,
+        anchor: () => document.querySelector(`div[data-row-key="${SESSION_PREFIX}${sessionId}"]`),
+      });
+      const place = popover.place;
+
+      if (currentEmoji) {
+        const removeBtn = el('button', { class: 'dwst-remove-btn', type: 'button', text: t('iconRemove') });
+        removeBtn.addEventListener('click', () => { delete store.sessionIcons[sessionId]; saveStore(); repaint(); popover.close(); });
+        popover.head.appendChild(removeBtn);
+      }
+      popover.body.appendChild(search);
+      popover.body.appendChild(list);
+
+      /** 选中表情：写入当前对话、计入「最近使用」，然后关闭。 */
+      function choose(emoji) {
+        store.sessionIcons[sessionId] = { type: 'emoji', value: emoji };
+        store.recentEmojis = [emoji, ...store.recentEmojis.filter((item) => item !== emoji)].slice(0, RECENT_LIMIT);
+        saveStore(); repaint(); popover.close();
+      }
+
+      function render() {
+        const q = search.value.trim().toLowerCase();
+        hideTip();
+        list.textContent = '';
+        // 每个表情格子：点选 + 悬浮显示名称（方便下次按名称搜索）。
+        const cellFor = (emoji) => {
+          const cell = el('button', { class: 'dwst-icon-cell', type: 'button', 'aria-label': emoji }, [el('span', { class: 'dwst-emoji', text: emoji })]);
+          if (emoji === currentEmoji) cell.classList.add('is-on');
+          const name = EMOJI_NAMES.get(emoji);
+          if (name) bindTip(cell, name);
+          cell.addEventListener('click', () => choose(emoji));
+          return cell;
+        };
+        const addGroup = (title, items, extraClass) => {
+          if (!items.length) return;
+          list.appendChild(el('div', { class: 'dwst-group-title', text: title }));
+          const grid = el('div', { class: extraClass ? `dwst-icon-grid ${extraClass}` : 'dwst-icon-grid' });
+          items.forEach((emoji) => grid.appendChild(cellFor(emoji)));
+          list.appendChild(grid);
+        };
+        // 「最近使用」单行横向滚动、按时间倒序；搜索时隐藏，避免干扰结果。
+        if (!q) addGroup(t('recentLabel'), store.recentEmojis, 'dwst-recent');
+        EMOJI_GROUPS_SAFE.forEach((group) => {
+          const items = group.items
+            .filter(([, name]) => !q || (name && name.toLowerCase().includes(q)) || group.title.includes(q))
+            .map(([emoji]) => emoji);
+          addGroup(group.title, items);
+        });
+        if (!list.children.length) list.appendChild(el('div', { class: 'dwst-empty', text: t('iconEmpty') }));
+        place();
+      }
+
+      search.addEventListener('input', render);
+      render();
+      popover.mount();
       search.focus();
     }
 
@@ -882,15 +1157,17 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     }
 
     // ===== 挂载 =====
+    /** 插件入口：注入样式、注册两个菜单与两个图标、监听工作区/对话变化并按时重画。 */
     function apply(ctx) {
       try {
         injectStyles();
-        const workspaces = ctx.get('workspaces');
+        const workspaces = ctx.workspaces || ctx.get('workspaces');
 
         let frame = 0;
         let ready = false;
         const paint = () => {
           try { paintDots(workspaces); } catch (error) { warn(error); }
+          try { paintSessionIcons(); } catch (error) { warn(error); }
         };
         const schedule = () => {
           if (frame) return;
@@ -910,9 +1187,11 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
 
         // 把标签图标注册进官方 contextMenu.icon 槽（keyed），供菜单项的 icon.key 引用。
         // 与官方写法一致：直接在 apply 里注入，生命周期随插件卸载自动回收。
+        let disposeIconSlots = null;
         try {
-          ctx.slots.inject('contextMenu.icon', function* () {
+          disposeIconSlots = ctx.slots.inject('contextMenu.icon', function* () {
             yield ctx.slots.register({ name: 'contextMenu.icon', key: TAG_ICON_KEY }, TagIcon);
+            yield ctx.slots.register({ name: 'contextMenu.icon', key: SESSION_ICON_KEY }, SmileyIcon);
           });
         } catch (error) {
           warn(error);
@@ -920,17 +1199,31 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
 
         ctx.effect(() => {
           const disposeLocale = registerLocale(ctx);
+          const t = translator(ctx); // 文案函数只取一次，避免每个菜单项重复绑定
 
           // 注册「打标签」菜单项：target=workspace，排在「重命名」(100) 与「删除」(300) 之间。
           let disposeMenu = () => {};
+          let disposeSessionMenu = () => {};
           try {
+            // 「插入图标」：会话菜单里排在「重命名」上方（会话菜单 pin=100 / rename=200）。
+            disposeSessionMenu = ctx.contextMenus.register({
+              id: 'session.icon',
+              target: 'session',
+              order: 150,
+              resolve: (value) => (value && value.sessionId ? [{
+                id: 'icon',
+                label: t('iconMenu'),
+                icon: { key: SESSION_ICON_KEY },
+                run: () => openSessionIconPicker(ctx, { sessionId: value.sessionId, title: value.displayTitle }, schedule),
+              }] : []),
+            });
             disposeMenu = ctx.contextMenus.register({
               id: 'workspace.tags',
               target: 'workspace',
               order: 150,
               resolve: (value) => (value && value.path ? [{
                 id: 'tags',
-                label: translator(ctx)('menu'),
+                label: t('menu'),
                 icon: { key: TAG_ICON_KEY },
                 run: () => openDialog(ctx, { path: value.path, title: value.displayTitle }, schedule),
               }] : []),
@@ -962,11 +1255,14 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
             observer.disconnect();
             controller.abort();
             try { if (typeof unsubscribe === 'function') unsubscribe(); } catch (error) { warn(error); }
-            disposeMenu();
-            disposeLocale();
+            safe(disposeMenu);
+            safe(disposeSessionMenu);
+            safe(disposeLocale);
+            safe(() => { if (typeof disposeIconSlots === 'function') disposeIconSlots(); });
             if (frame) { cancelAnimationFrame(frame); frame = 0; }
             document.getElementById(STYLE_ID)?.remove();
             queryAll('[' + DOTS_ATTR + ']').forEach((node) => node.remove());
+            queryAll('[' + SESSION_ICON_ATTR + ']').forEach((node) => node.remove());
             hideTip();
             if (closeActiveDialog) closeActiveDialog();
           };
