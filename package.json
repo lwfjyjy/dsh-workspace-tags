@@ -1,6 +1,6 @@
 {
   "name": "@lwfjyjy/dsh-workspace-tags",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "DeepSeek Harness 桌面版侧栏增强：给工作区（文件夹）打彩色标签、给对话插入 Emoji 图标。纯前端 DOM 注入，不修改 DSH 源码。",
   "type": "module",
   "license": "MIT",

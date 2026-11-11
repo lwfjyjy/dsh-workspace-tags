@@ -173,6 +173,7 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         recentLabel: '最近使用',
         iconEmpty: '没有匹配的图标',
         iconRemove: '移除图标',
+        editIcon: '修改图标',
       },
       en: {
         menu: 'Tags',
@@ -198,6 +199,7 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         recentLabel: 'Recently used',
         iconEmpty: 'No matching icon',
         iconRemove: 'Remove icon',
+        editIcon: 'Edit icon',
       },
     });
 
@@ -482,7 +484,9 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
           animation:dwstTipIn .15s var(--ds-ease-in-out);}
         @keyframes dwstTipIn{0%{opacity:0}}
         @media (prefers-reduced-motion:reduce){.dwst-dot-tip{animation:none}}
-        .dwst-sicon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin:0 0 0 var(--dsh-sidebar-label-gap);flex:0 0 auto;color:var(--dsw-alias-label-secondary);pointer-events:none;}
+        .dwst-sicon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin:0 0 0 var(--dsh-sidebar-label-gap);flex:0 0 auto;padding:0;border:none;background:transparent;border-radius:var(--dsw-radius-sm,4px);color:var(--dsw-alias-label-secondary);cursor:pointer;}
+        .dwst-sicon:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(128,128,128,.14));}
+        .dwst-sicon:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:1px;}
         .dwst-sicon .dwst-emoji{font-size:15px;line-height:1;}
         .dwst-sicon svg{width:15px;height:15px;}
         .dwst-group-title{padding:6px 6px 4px;font-size:12px;color:var(--dsw-alias-label-secondary);}
@@ -599,18 +603,32 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
     }
 
     // ===== 对话行前的自定义图标 =====
-    /** 把 Emoji 图标画到对话行标题前；无图标或非 Emoji 时移除。 */
-    function paintSessionIcons() {
+    /** 把 Emoji 图标画成可点击按钮放到对话行标题前；无图标或非 Emoji 时移除。 */
+    function paintSessionIcons(ctx, repaint) {
+      const t = translator(ctx);
       queryAll(SEL.sessionRow).forEach((row) => {
         const sessionId = (row.getAttribute('data-row-key') || '').slice(SESSION_PREFIX.length);
         const icon = sessionId ? store.sessionIcons[sessionId] : null;
         let box = row.querySelector('[' + SESSION_ICON_ATTR + ']');
-        // 只支持表情图标；没有或不是表情则移除。
-        if (!icon || icon.type !== 'emoji' || !icon.value) {
-          if (box) box.remove();
-          return;
+        // 只支持表情图标；没有或不是表情则移除。非按钮的旧节点也一并重建。
+        if (!icon || icon.type !== 'emoji' || !icon.value || (box && box.tagName !== 'BUTTON')) {
+          if (box) { hideTip(); box.remove(); box = null; }
+          if (!icon || icon.type !== 'emoji' || !icon.value) return;
         }
-        if (!box) box = el('span', { class: 'dwst-sicon', [SESSION_ICON_ATTR]: '' });
+        if (!box) {
+          box = el('button', { class: 'dwst-sicon', type: 'button', [SESSION_ICON_ATTR]: '', 'aria-label': t('editIcon') });
+          // 点击图标打开表情选择器；阻止事件冒泡，避免顺带切换/展开对话。
+          box.addEventListener('pointerdown', (event) => event.stopPropagation());
+          box.addEventListener('mousedown', (event) => event.stopPropagation());
+          box.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const titleEl = row.querySelector(SEL.sessionTitle);
+            const title = titleEl ? titleEl.textContent.trim() : sessionId;
+            openSessionIconPicker(ctx, { sessionId, title }, repaint);
+          });
+          bindTip(box, t('editIcon'));
+        }
         if (box.dataset.sig !== icon.value) {
           box.dataset.sig = icon.value;
           box.textContent = '';
@@ -1167,7 +1185,7 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
         let ready = false;
         const paint = () => {
           try { paintDots(workspaces); } catch (error) { warn(error); }
-          try { paintSessionIcons(); } catch (error) { warn(error); }
+          try { paintSessionIcons(ctx, schedule); } catch (error) { warn(error); }
         };
         const schedule = () => {
           if (frame) return;
