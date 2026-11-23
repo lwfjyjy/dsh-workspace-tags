@@ -1040,6 +1040,8 @@ var me=Object.create;var ut=Object.defineProperty;var de=Object.getOwnPropertyDe
       // 回车 = 确认新建（有待建文字且没有同名标签时才生效）。
       // 键盘：↑↓ 切换高亮项，回车执行当前高亮项（第一项默认高亮）。
       search.addEventListener('keydown', (event) => {
+        // 输入法选词中：回车/上下键只用于确认候选词，一律不触发新建或选中，避免误提交。
+        if (event.isComposing || event.keyCode === 229) return;
         if (event.key === 'ArrowDown') { event.preventDefault(); moveActive(1); return; }
         if (event.key === 'ArrowUp') { event.preventDefault(); moveActive(-1); return; }
         if (event.key !== 'Enter') return;
